@@ -402,3 +402,12 @@ body:has(.bottom-bar.visible) footer{padding-bottom:175px!important}
 .product .product-order-btn{grid-column:1/-1!important}
 .product-summary:focus-visible{outline:2px solid var(--red);outline-offset:3px;border-radius:8px}
 @media(max-width:390px){.product-summary{grid-template-columns:74px minmax(0,1fr);gap:9px}.product-summary .product-thumb{width:74px;height:78px}.product-summary .product-name{padding-right:70px;font-size:13px}.product-toggle-label{font-size:10px}}
+
+/* V14.9: compact accordion affordance and visible cart CTA */
+.product-toggle-label{margin-top:-17px!important;margin-bottom:5px!important;gap:7px!important;align-self:end!important;min-height:24px;line-height:1.2}
+.product-toggle-chevron{display:inline-flex!important;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:#fff0e8;border:1px solid #efd5c6;color:#a52721;transition:transform .2s ease}
+.product-toggle-chevron svg{width:15px;height:15px;display:block}
+.ingredients-open .product-toggle-chevron{transform:rotate(180deg)}
+.bottom-bar .bottom-checkout.cart-ready{background:#168548!important;color:#fff!important;border-color:#168548!important;box-shadow:0 3px 12px rgba(22,133,72,.22)!important}
+.bottom-bar .bottom-checkout.cart-ready:hover{background:#116d3a!important}
+@media(max-width:390px){.product-toggle-label{font-size:10px!important;margin-top:-13px!important}.product-toggle-chevron{width:20px;height:20px}}
