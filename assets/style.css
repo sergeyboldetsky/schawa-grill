@@ -416,6 +416,6 @@ body:has(.bottom-bar.visible) footer{padding-bottom:175px!important}
 .product-summary{position:relative!important;min-height:96px!important}
 .product-summary .product-main{padding-right:0!important}
 .product-summary .price{padding-right:125px!important}
-.product-toggle-label{position:absolute!important;right:0!important;bottom:27px!important;grid-column:auto!important;margin:0!important;min-height:24px!important;align-self:auto!important;z-index:1;white-space:nowrap!important}
-@media(max-width:390px){.product-toggle-label{bottom:25px!important;margin:0!important;font-size:10px!important}.product-summary .price{padding-right:112px!important}}
+.product-toggle-label{position:absolute!important;right:0!important;bottom:16px!important;grid-column:auto!important;margin:0!important;min-height:24px!important;align-self:auto!important;z-index:1;white-space:nowrap!important}
+@media(max-width:390px){.product-toggle-label{bottom:16px!important;margin:0!important;font-size:10px!important}.product-summary .price{padding-right:112px!important}}
 .lang{cursor:pointer!important;display:inline-flex!important;align-items:center;justify-content:center;gap:3px;min-width:40px}.lang:focus-visible{outline:2px solid #c40020;outline-offset:3px}
