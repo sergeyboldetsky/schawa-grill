@@ -212,3 +212,14 @@ footer{background:#fffaf5;border-top:1px solid #eee0d3;padding-top:28px!importan
 .order-mode .mode-choice:has(input:checked){border-color:#94cba9;background:#edf8f0;color:#1a5834}
 .order-mode input{accent-color:#288e55;flex:none;width:18px;height:18px;margin:0}
 @media(max-width:350px){.order-mode .mode-choice{font-size:11px;padding:10px 7px}}
+
+/* V13.5: mandatory ingredient locks and persistent quick menu */
+.ingredient{position:relative!important}
+.ingredient-lock{position:absolute;top:3px;right:3px;font-size:10px;line-height:1;background:#fff5d9;border-radius:50%;padding:2px;z-index:2}
+.cart-line .ingredient-toggle.mandatory{background:#eaf8ef!important;border-color:#a7d8b7!important;cursor:default}
+.cart-line .ingredient-toggle.mandatory::after{content:none!important}
+.quick-menu{position:fixed;z-index:49;right:max(14px,calc((100vw - 680px)/2 + 15px));bottom:calc(92px + env(safe-area-inset-bottom));width:60px;height:60px;border-radius:50%;border:2px solid #fff;background:#c91023;color:white;box-shadow:0 5px 18px #0004;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;font-weight:800}
+.quick-menu>span{font-size:19px;line-height:1}.quick-menu small{font-size:11px;line-height:1.2}
+.quick-menu:focus-visible{outline:3px solid #f8a453;outline-offset:3px}
+body:has(#menu.page.active) .quick-menu{display:none}
+@media(max-width:380px){.quick-menu{width:53px;height:53px;right:12px;bottom:calc(86px + env(safe-area-inset-bottom))}}

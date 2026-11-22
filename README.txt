@@ -16,3 +16,5 @@ IMPORTANT:
 - Location and opening hours are deliberately not invented; example addresses and reviews from mockups are NOT published.
 - Prices are provisional, based on user-supplied examples; do not take payments with this version.
 - The German-language site is implemented; the language button currently informs users other languages are planned.
+
+V13.5: обязательные лаваш и мясо с замком; сыр входит в состав сырной и гавайской шаурмы, ананас и кукуруза в гавайскую; круглая кнопка быстрого перехода к меню.
