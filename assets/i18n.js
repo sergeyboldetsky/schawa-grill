@@ -20,14 +20,15 @@ const translations={
 const original=new WeakMap();const lastRendered=new WeakMap();const attrs=new WeakMap();let language='de';let busy=false;
 const textTranslate=(s)=>{const trimmed=s.trim();if(!trimmed)return s;let result=translations[trimmed];if(!result){const match=trimmed.match(/^(\d+) Artikel · (.+)$/);if(match)result=match[1]+' товаров · '+match[2];else if(/^Voraussichtliche Abholung gegen /.test(trimmed))result=trimmed.replace('Voraussichtliche Abholung gegen ','Примерное время получения: ').replace(' Uhr (Münchner Zeit) · unverbindlich bis zur Bestätigung.',' (время Мюнхена) · после подтверждения.');else if(/^In \d+ Minuten$/.test(trimmed))result=trimmed.replace('In ','Через ').replace(' Minuten',' минут');else if(/^\d+ Min$/.test(trimmed))result=trimmed.replace(' Min',' мин');else if(/^\d+ Artikel ·/.test(trimmed))result=trimmed.replace(' Artikel ·',' товаров ·');}
 return result===undefined?s:s.replace(trimmed,result);};
-function apply(){if(busy)return;busy=true;try{
+let observer=null;
+function apply(){if(busy)return;busy=true;if(observer)observer.disconnect();try{
  document.documentElement.lang=language;
  const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,{acceptNode(node){return node.parentElement&& !node.parentElement.closest('script,style,svg')?NodeFilter.FILTER_ACCEPT:NodeFilter.FILTER_REJECT}});let node;
  while((node=walker.nextNode())){if(!original.has(node)||node.nodeValue!==lastRendered.get(node))original.set(node,node.nodeValue);const base=original.get(node);const next=language==='ru'?textTranslate(base):base;if(node.nodeValue!==next)node.nodeValue=next;lastRendered.set(node,next);}
  document.querySelectorAll('[placeholder],[aria-label],[title]').forEach(el=>{for(const key of ['placeholder','aria-label','title']){if(!el.hasAttribute(key))continue;let m=attrs.get(el);if(!m){m={};attrs.set(el,m)}if(!(key in m))m[key]=el.getAttribute(key);const base=m[key];const next=language==='ru'?textTranslate(base):base;if(el.getAttribute(key)!==next)el.setAttribute(key,next)}});
- const btn=document.getElementById('langBtn');if(btn){btn.innerHTML=language.toUpperCase()+' <span aria-hidden="true">⌄</span>';btn.setAttribute('aria-label',language==='ru'?'Язык: русский. Переключить на немецкий':'Sprache: Deutsch. Auf Russisch wechseln');}
- }finally{busy=false;}}
+ const btn=document.getElementById('langBtn');if(btn){const desired=language.toUpperCase()+' <span aria-hidden="true">⌄</span>';if(btn.innerHTML!==desired)btn.innerHTML=desired;const label=language==='ru'?'Язык: русский. Переключить на немецкий':'Sprache: Deutsch. Auf Russisch wechseln';if(btn.getAttribute('aria-label')!==label)btn.setAttribute('aria-label',label);}
+ }finally{busy=false;if(observer)observer.observe(document.body,{childList:true,subtree:true,characterData:true});}}
 try{language=localStorage.getItem('schawa-grill-language')==='ru'?'ru':'de'}catch(e){}
 const btn=document.getElementById('langBtn');btn?.addEventListener('click',()=>{language=language==='de'?'ru':'de';try{localStorage.setItem('schawa-grill-language',language)}catch(e){}apply()});
-let queued=false;const observer=new MutationObserver(()=>{if(busy||queued)return;queued=true;queueMicrotask(()=>{queued=false;apply()})});observer.observe(document.body,{childList:true,subtree:true,characterData:true});apply();
+let queued=false;observer=new MutationObserver(()=>{if(busy||queued)return;queued=true;queueMicrotask(()=>{queued=false;apply()})});apply();
 })();
