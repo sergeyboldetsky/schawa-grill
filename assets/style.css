@@ -340,3 +340,29 @@ body:has(.bottom-bar.visible) footer{padding-bottom:175px!important}
 
 /* V14.3: quick pickup time buttons */
 .pickup-label{display:block;font-size:13px;font-weight:700;margin:14px 0 8px}.pickup-options{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}.pickup-option{min-width:0;border:1px solid #e6d4c8;border-radius:11px;background:#fffaf6;color:#30211b;padding:12px 2px;font-size:12px;font-weight:800;white-space:nowrap}.pickup-option.selected{background:#c91720;color:#fff;border-color:#c91720;box-shadow:0 3px 8px #c917202b}.pickup-option:focus-visible{outline:3px solid #ff9a5b;outline-offset:2px}#pickup[hidden]{display:none!important}@media(max-width:360px){.pickup-options{gap:4px}.pickup-option{font-size:11px;padding:11px 1px}}
+
+/* V14.3.1: keep the egg-free label inside the first-screen hero */
+.hero.hero-photo .hero-eggfree{
+  box-sizing:border-box;
+  right:10px;
+  left:auto;
+  top:10px;
+  width:max-content;
+  max-width:min(190px,calc(100% - 20px));
+  padding:6px 9px;
+  font-size:10px;
+  line-height:1.25;
+  white-space:normal;
+  overflow-wrap:break-word;
+  text-align:center;
+}
+@media(max-width:480px){
+  .hero.hero-photo .hero-eggfree{
+    right:8px;
+    top:8px;
+    max-width:min(155px,calc(100% - 16px));
+    padding:5px 7px;
+    font-size:9px;
+  }
+  .hero.hero-photo .hero-eggfree .egg-no-icon{width:15px;height:15px;font-size:12px;margin-right:2px}
+}
