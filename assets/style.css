@@ -366,3 +366,9 @@ body:has(.bottom-bar.visible) footer{padding-bottom:175px!important}
   }
   .hero.hero-photo .hero-eggfree .egg-no-icon{width:15px;height:15px;font-size:12px;margin-right:2px}
 }
+
+/* V14.4: crisp SVG navigation and compact 5-minute pickup choices */
+.drawer .nav-symbol svg{width:21px;height:21px;display:block;stroke:#ffe6d6}.drawer button:hover .nav-symbol{background:#794234}.drawer button:focus-visible{outline:2px solid #f8bd7d;outline-offset:2px}
+.pickup-options{grid-template-columns:repeat(5,minmax(0,1fr));gap:7px}.pickup-option{min-height:42px;white-space:nowrap;font-variant-numeric:tabular-nums}
+@media(max-width:380px){.pickup-options{gap:5px}.pickup-option{font-size:11px;padding:10px 0}}
+.combo-drink select{font-size:14px;min-height:42px}
