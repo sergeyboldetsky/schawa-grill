@@ -179,3 +179,26 @@ footer{background:#fffaf5;border-top:1px solid #eee0d3;padding-top:28px!importan
 .cart-line .extras-rows .extra-row:has(input:checked){background:#fff5f0!important;border-color:#d8a390!important}
 .eggfree-promise{border-color:#e4c9a8;background:#fff8ec}.eggfree-mark{width:34px;height:34px;border-radius:50%;background:#fff0d5;color:#b51d22;display:grid;place-items:center;font-weight:900;font-size:21px}.eggfree-menu-note{display:inline-block;margin:0 auto 8px;padding:7px 12px;background:#fff5e7;border:1px solid #e9d7bf;border-radius:22px;color:#8e3a25;font-size:11px;font-weight:750}
 @media(prefers-reduced-motion:reduce){.added-toast{transition:none}}
+
+/* V13.3 — focused mobile usability updates */
+/* Extras: cost sits on the right in the same line, no second-row price. */
+.cart-line .extras.extras-rows .extra-row{flex-wrap:nowrap!important;min-height:41px!important;gap:7px!important;padding:7px 9px!important}
+.cart-line .extras-rows .extra-row span{flex:1 1 auto!important;min-width:0!important;font-size:11px!important;line-height:1.2!important}
+.cart-line .extras-rows .extra-row small{flex:0 0 auto!important;margin:0 0 0 auto!important;white-space:nowrap!important;font-size:10px!important}
+/* Checked ingredient means included; unchecked stays available and legible. */
+.cart-line .ingredient-toggle:has(input:checked):not(:has(input:disabled)){background:#eaf8ef!important;border:1px solid #a7d8b7!important;color:#174b31!important;opacity:1!important}
+.cart-line .ingredient-toggle:has(input:checked):not(:has(input:disabled))::after{background:#288e55!important;color:white!important}
+.cart-line .ingredient-toggle.removed{background:#fffaf6!important;border:1px solid #e8d9cd!important;color:#57443a!important;opacity:1!important;text-decoration:none!important}
+.cart-line .ingredient-toggle.removed .ingredient-photo{filter:none!important;opacity:1!important}
+.cart-line .ingredient-toggle.removed .ingredient-label{text-decoration:none!important;color:#57443a!important}
+.cart-line .ingredient-toggle:has(input:disabled){background:#fff8f1!important;opacity:1!important}
+/* Extras and half-portion selected state: green. */
+.cart-line .extras-rows .extra-row input[type=checkbox]:checked,.cart-line .half-option input[type=checkbox]:checked{background:#288e55!important;border-color:#288e55!important}
+.cart-line .extras-rows .extra-row:has(input:checked){background:#eff9f2!important;border-color:#a8d8b8!important}
+.pickup-estimate{margin:7px 0 15px;padding:10px 12px;background:#edf8f0;border:1px solid #b8dfc4;border-radius:10px;color:#24583a;font-size:12px;line-height:1.4;font-weight:650}
+/* Keep the brand centred while making menu action self-explanatory. */
+.top #menuBtn{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:0!important;width:64px!important;min-width:64px!important;height:56px!important;padding:4px 0!important}
+.menu-glyph{display:block;font-size:24px;line-height:1.1}.menu-caption{display:block;font-size:10px;font-weight:750;line-height:1.2}
+.hero.hero-photo{position:relative}
+.hero-eggfree{position:absolute;right:12px;top:12px;z-index:2;max-width:170px;background:rgba(255,249,235,.95);border:1px solid #f0d2a7;color:#6e2f16;padding:7px 9px;border-radius:999px;font-size:10px;font-weight:800;line-height:1.2;box-shadow:0 2px 8px #0003}
+@media(max-width:380px){.top #menuBtn{width:52px!important;min-width:52px!important}.hero-eggfree{right:8px;top:9px;font-size:9px;padding:6px 8px;max-width:135px}.cart-line .extras-rows .extra-row{padding:6px!important}.cart-line .extras-rows .extra-row span{font-size:10px!important}.cart-line .extras-rows .extra-row small{font-size:9px!important}}
