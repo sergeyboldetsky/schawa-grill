@@ -7,3 +7,5 @@ Schawa Grill V14
 - Add-to-cart success feedback and cart count animation.
 
 Demo: WhatsApp number and physical location remain unconfigured.
+
+V14.1: small crossed-out egg symbol on Knoblauchsoße ingredient; green WhatsApp checkout button with WhatsApp SVG icon.
