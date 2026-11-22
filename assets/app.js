@@ -33,7 +33,7 @@ function defaultIds(p){return new Set(ingredientsFor(p).map(([id])=>id))}
 function ingredientsHtml(line,editable,product){
  const p=product||(line&&products.find(x=>x.id===line.id))||products[0];
  const defaults=defaultIds(p);
- const shown=editable?ingredients:ingredientsFor(p);
+ const shown=editable?ingredients.filter(([id])=>defaults.has(id)):ingredientsFor(p);
  return `<div class="ingredients ${editable?'editable':''}">${shown.map(([id,icon,label])=>{
   const mandatory=mandatoryIngredients.has(id);
   const defaultIncluded=defaults.has(id);
@@ -44,11 +44,20 @@ function ingredientsHtml(line,editable,product){
   return editable?`<label class="ingredient ingredient-toggle ${enabled?'':'removed'} ${mandatory?'mandatory':''} ${!defaultIncluded?'ingredient-addable':''}" ${mandatory?'title="Pflichtzutat – immer enthalten"':''}><input type="checkbox" data-ingredient="${id}" data-line="${line.uid}" ${enabled?'checked':''} ${mandatory?'disabled':''}><img class="ingredient-photo" src="assets/${icon}" alt="" loading="lazy"><span class="ingredient-label">${label}</span>${optionalLabel}${priceLabel}${mandatory?'<span class="ingredient-lock" aria-label="Pflichtzutat">🔒</span>':''}</label>`:`<span class="ingredient"><img class="ingredient-photo" src="assets/${icon}" alt="" loading="lazy"><span class="ingredient-label">${label}</span>${mandatory?'<span class="ingredient-lock" aria-label="Pflichtzutat">🔒</span>':''}</span>`
  }).join('')}</div>`
 }
-function extrasHtml(line){return `<p class="option-hint">Extras wählen (kostenlose zuerst):</p><div class="extras extras-rows">${extras.map(([id,label,price])=>`<label class="extra-row"><input type="checkbox" data-extra="${id}" data-line="${line.uid}" ${line.extras[id]?'checked':''} ${id==='sauce'&&line.ingredients.sauce===false?'disabled':''}><span>${label}</span><small>${price===0?'Kostenlos':'+'+euro(price)}</small></label>`).join('')}</div>`}
+function extrasHtml(line){
+ const p=products.find(x=>x.id===line.id), defaults=defaultIds(p);
+ const optional=ingredients.filter(([id])=>['cheese','pineapple','corn'].includes(id)&&!defaults.has(id));
+ const baseExtras=extras.map(([id,label,price])=>`<label class="extra-row"><input type="checkbox" data-extra="${id}" data-line="${line.uid}" ${line.extras[id]?'checked':''} ${id==='sauce'&&line.ingredients.sauce===false?'disabled':''}><span>${label}</span><small>${price===0?'Kostenlos':'+'+euro(price)}</small></label>`);
+ const ingredientExtras=optional.map(([id,,label])=>`<label class="extra-row"><input type="checkbox" data-ingredient="${id}" data-line="${line.uid}" ${line.ingredients[id]?'checked':''}><span>${label}</span><small>+${euro(ingredientAddPrices[id]||0)}</small></label>`);
+ const all=[...baseExtras,...ingredientExtras];
+ const free=all.filter((_,i)=>i<baseExtras.length&&extras[i][2]===0);
+ const paid=all.filter((_,i)=>i>=baseExtras.length||extras[i][2]>0);
+ return `<p class="option-hint">Extras wählen (kostenlose zuerst):</p><div class="extras extras-rows">${[...free,...paid].join('')}</div>`;
+}
 function priceOf(line){const p=products.find(x=>x.id===line.id);const defaults=defaultIds(p);const added=ingredients.reduce((sum,[id])=>sum+(!defaults.has(id)&&line.ingredients[id]===true?(ingredientAddPrices[id]||0):0),0);return line.price+added+extras.reduce((n,[id,,price])=>n+(line.extras[id]?price:0),0)}
 function newLine(p){return {drink:p.category==='combos'?'water':null,uid:++serial,id:p.id,name:p.name,price:p.price,image:p.image,category:p.category,ingredients:Object.fromEntries(ingredients.map(([id])=>[id,defaultIds(p).has(id)])),extras:{},halved:false,note:''}}
 function renderHomeCategories(){document.querySelectorAll('.home-category-panel').forEach(panel=>{const cat=panel.dataset.cat;panel.innerHTML=products.filter(p=>p.category===cat).map(p=>`<button class="home-product" data-add="${p.id}"><img src="assets/${p.image}" alt=""><span><strong>${esc(p.name)}</strong><small>${esc(p.desc)}</small></span><b>${euro(p.price)} +</b></button>`).join('')})}
-function renderMenu(){const items=products.filter(p=>filter==='all'||p.category===filter);const html=items.map(p=>`<article class="product"><div class="product-thumb ${isShawarma(p)?'shawarma-thumb':''}"><img src="assets/${p.image}" alt="${esc(p.name)}" loading="lazy"></div><div class="product-main"><h3>${esc(p.name)}</h3><p>${esc(p.desc)}</p><div class="price">${euro(p.price)}</div></div><button class="add" data-add="${p.id}" aria-label="${esc(p.name)} hinzufügen">+</button>${isShawarma(p)?`<div class="product-ingredients">${ingredientsHtml(null,false,p)}</div>`:''}</article>`).join('');$('#products').innerHTML=html;$('#homeProducts').innerHTML=html}
+function renderMenu(){const items=products.filter(p=>filter==='all'||p.category===filter);const html=items.map(p=>`<article class="product"><div class="product-thumb ${isShawarma(p)?'shawarma-thumb':''}"><img src="assets/${p.image}" alt="${esc(p.name)}" loading="lazy"></div><div class="product-main"><h3>${esc(p.name)}</h3><p>${esc(p.desc)}</p><div class="price">${euro(p.price)}</div></div>${isShawarma(p)?`<div class="product-ingredients">${ingredientsHtml(null,false,p)}</div>`:''}<button class="product-order-btn" data-add="${p.id}" aria-label="${esc(p.name)} bestellen">${isShawarma(p)?'🌯 Jetzt bestellen':'＋ Hinzufügen'} <span aria-hidden="true">›</span></button></article>`).join('');$('#products').innerHTML=html;$('#homeProducts').innerHTML=html}
 function add(id){const p=products.find(x=>x.id===id);if(!p)return;cart.push(newLine(p));renderOrder();updateBottom();showAddedToast(p.name)}
 let toastTimer;function showAddedToast(name){const toast=$('#addedToast');if(!toast)return;toast.querySelector('.toast-product').textContent=name;toast.classList.add('show');toast.setAttribute('aria-hidden','false');clearTimeout(toastTimer);toastTimer=setTimeout(()=>{toast.classList.remove('show');toast.setAttribute('aria-hidden','true')},2700)}
 function remove(uid){cart=cart.filter(x=>x.uid!==uid);renderOrder();updateBottom()}

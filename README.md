@@ -1,1 +1,1 @@
-Schawa Grill V13.7 — demo website. Flexible shawarma ingredients: optional cheese +1 EUR, pineapple +0.50 EUR, corn +0.50 EUR (indicative prices). No live parking address or map route is confirmed. WhatsApp number remains unset. Replace legal demo text before launch.
+Schawa Grill V13.9: redesigned mobile navigation with icons; circular header map; optional cheese, pineapple, corn moved to extras rows; full-width order buttons beneath ingredients. Google Maps address remains pending.
