@@ -148,3 +148,21 @@ footer{background:#fffaf5;border-top:1px solid #eee0d3;padding-top:28px!importan
 /* Extras deliberately use clean, single-line controls instead of image tiles */
 .cart-line .extras.extras-rows{display:flex!important;flex-direction:column!important;gap:6px!important;margin:12px 0!important}.cart-line .extras-rows .extra-row{display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;gap:9px!important;min-height:38px!important;padding:8px 10px!important;border:1px solid #e9dbcf!important;background:#fff!important;border-radius:9px!important;text-align:left!important}.extras-rows .extra-row input{position:static!important;appearance:auto!important;width:16px!important;height:16px!important;flex:none;margin:0!important}.extras-rows .extra-row span{font-size:12px!important;color:#2c211b!important;font-weight:600!important;flex:1!important}.extras-rows .extra-row small{font-size:11px!important;color:#b90d21!important;white-space:nowrap!important}.extras-rows .extra-row:has(input:checked){background:#fff6ef!important;border-color:#dfb9a5!important}.extras-rows .extra-row:has(input:disabled){opacity:.5}
 .combo-included{background:#fff4e8;color:#69452d;border-radius:8px;padding:9px 10px;font-size:11px;font-weight:700;margin:9px 0}.combo-drink{display:block;font-size:12px;font-weight:750;margin:10px 0}.combo-drink select{display:block;width:100%;margin-top:5px;border:1px solid #e1cfc1;border-radius:9px;background:#fff;padding:10px;color:#251c17;font:inherit}.product-ingredients{width:100%}@media(max-width:380px){.home-tabs{gap:4px}.home-tabs button{padding:8px 10px!important;font-size:11px!important}}
+
+/* V13 - clean two-column extras, food photography and mobile cart */
+.product-thumb,.order-thumb,.cart-mini-photo{background:#0b0b0c!important}
+.product-thumb img,.order-thumb img,.cart-mini-photo{object-fit:contain!important;object-position:center!important}
+.product-thumb.shawarma-thumb img,.order-thumb.shawarma-thumb img{object-fit:contain!important}
+.product .ingredient-label,.cart-line .ingredient-label{font-size:8px!important}
+.cart-line .extras.extras-rows{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:7px!important;margin:8px 0 13px!important}
+.cart-line .extras-rows .extra-row{min-width:0!important;min-height:48px!important;padding:7px!important;gap:5px!important;flex-wrap:wrap!important}
+.extras-rows .extra-row span{font-size:11px!important;min-width:0!important;flex:1 1 65%!important}
+.extras-rows .extra-row small{margin-left:20px;font-size:10px!important}
+.cart-line .option-hint{margin:12px 0 7px!important;font-size:11px!important}
+.cart-line-top{grid-template-columns:45px minmax(0,1fr) auto auto!important;gap:7px!important;align-items:center!important}
+.cart-line-top>strong:nth-of-type(2){grid-column:2!important;grid-row:2!important}
+.cart-qty{grid-column:3!important;grid-row:1/3!important}
+.remove-line{grid-column:4!important;grid-row:1/3!important}
+.cart-mini-photo{width:45px!important;height:45px!important;grid-column:1;grid-row:1/3}
+#orderProducts{display:none!important}
+@media(max-width:380px){.cart-line .extras.extras-rows{gap:5px!important}.extras-rows .extra-row span{font-size:10px!important}.cart-line-top{grid-template-columns:40px minmax(0,1fr) auto auto!important;gap:4px!important}.cart-qty button{width:25px!important;height:28px!important}}
