@@ -1,1 +1,1 @@
-Schawa Grill V8 — full GitHub Pages project. Generated ingredient photos in assets/ingredient-*.webp. Original logo preserved. WhatsApp recipient still needs configuration in assets/app.js. Demo prices and operating status.
+Schawa Grill V9 — GitHub Pages static website. Changes: four ingredients per row; compact header status; menu toggle close icon; one bottom action bar; sauce extras depend on sauce ingredient; mandatory lavash; cheese and hot sauce extras; improved mobile cart layout. No WhatsApp bot or verified opening hours.
