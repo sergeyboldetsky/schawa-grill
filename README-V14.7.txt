@@ -1,0 +1,1 @@
+V14.7: Clean shawarma hero image (no embedded logo/text); consistent Google Maps marker in header and route; removed drink size selection and fixed all drinks at 0.5 l. Based on user-uploaded repository.
