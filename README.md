@@ -6,3 +6,6 @@ Schawa Grill V13.4
 - Egg-free garlic sauce copy simplified.
 
 Demo only: WhatsApp number, opening hours, legal information, and actual on-site seating availability remain unconfirmed.
+
+
+V13.6: Hawaii without cheese, tomatoes or pickles; ingredient photography for cheese/pineapple/corn; mandatory lock badge no longer overlaps checked marker.

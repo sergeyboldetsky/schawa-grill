@@ -223,3 +223,9 @@ footer{background:#fffaf5;border-top:1px solid #eee0d3;padding-top:28px!importan
 .quick-menu:focus-visible{outline:3px solid #f8a453;outline-offset:3px}
 body:has(#menu.page.active) .quick-menu{display:none}
 @media(max-width:380px){.quick-menu{width:53px;height:53px;right:12px;bottom:calc(86px + env(safe-area-inset-bottom))}}
+
+/* V13.6: mandatory lock is the only corner marker; smaller and not overlapping */
+.cart-line .ingredient-toggle.mandatory::after,
+.cart-line .ingredient-toggle:has(input:disabled)::after{content:none!important;display:none!important}
+.ingredient-lock{position:absolute!important;top:3px!important;right:3px!important;z-index:4!important;font-size:9px!important;line-height:1!important;padding:1px!important;background:#fff7e8!important;border:1px solid #ead7b4!important;border-radius:4px!important;box-shadow:0 1px 2px #0001!important}
+.product .ingredient:has(.ingredient-lock),.cart-line .ingredient.mandatory{padding-top:7px!important}
