@@ -1,1 +1,9 @@
-Schawa Grill V13.10: fixed desktop sticky header inside 700px centered site; Shawarma Scharf 10,00 EUR and spicy badge. Upload all files to GitHub Pages.
+Schawa Grill V14
+
+- Extra Knoblauchsoße removed from extras and WhatsApp ordering.
+- Egg-free sauce badge now has a crossed-out egg.
+- Full-width mobile cart button, raised floating Menu button, safe-area spacing.
+- Bestseller, Neu, Scharf labels.
+- Add-to-cart success feedback and cart count animation.
+
+Demo: WhatsApp number and physical location remain unconfigured.
