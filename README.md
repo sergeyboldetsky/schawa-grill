@@ -1,8 +1,1 @@
-Schawa Grill V14.2
-
-- Shawarma Pilze (marinierte Champignons), Demo-Preis 11,50 EUR
-- Champignons als optionale Zutat +1,00 EUR (Demo-Preis)
-- Ei-frei-Badge am Knoblauchsoße-Foto links oben
-- Kompakter WhatsApp-Button mit begrenztem SVG
-- Warenkorb in localStorage gespeichert, inklusive Zutaten, Extras und Kommentare
-- WhatsApp-Nummer noch nicht eingerichtet; kein automatischer Bot.
+Schawa Grill V14.3 — only change: pickup time selection now uses five buttons (15, 20, 30, 45, 60 Min), default 20 Min. Existing WhatsApp message and Munich time estimate remain connected to the selection.
