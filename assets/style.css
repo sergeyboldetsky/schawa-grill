@@ -372,3 +372,15 @@ body:has(.bottom-bar.visible) footer{padding-bottom:175px!important}
 .pickup-options{grid-template-columns:repeat(5,minmax(0,1fr));gap:7px}.pickup-option{min-height:42px;white-space:nowrap;font-variant-numeric:tabular-nums}
 @media(max-width:380px){.pickup-options{gap:5px}.pickup-option{font-size:11px;padding:10px 0}}
 .combo-drink select{font-size:14px;min-height:42px}
+
+/* V14.5: hero always constrained to the actual mobile viewport */
+.hero.hero-photo{display:block!important;position:relative!important;overflow:hidden!important;isolation:isolate;width:100%!important;max-width:100%!important;min-width:0!important;min-height:350px;aspect-ratio:auto!important;background-size:cover!important;background-position:center 44%!important}
+.hero.hero-photo .hero-content{position:absolute!important;inset:auto 0 0 0!important;width:100%!important;max-width:100%!important;min-width:0!important;box-sizing:border-box!important;display:flex!important;align-items:flex-start!important;justify-content:flex-end!important;flex-direction:column!important;padding:90px 20px 23px!important;background:linear-gradient(0deg,rgba(15,7,5,.95),rgba(15,7,5,.62) 45%,transparent)!important}
+.hero.hero-photo .hero-content h1{max-width:100%!important;white-space:normal!important;overflow-wrap:break-word!important;font-size:clamp(32px,9vw,54px)!important;line-height:1.06!important}
+.hero.hero-photo .hero-content p{max-width:min(290px,100%)!important;overflow-wrap:break-word!important}
+.hero.hero-photo .hero-eggfree{position:absolute!important;right:10px!important;left:auto!important;top:12px!important;max-width:min(160px,calc(100% - 24px))!important;white-space:normal!important;overflow-wrap:anywhere!important;z-index:3!important}
+@media(min-width:500px){.hero.hero-photo{min-height:390px}.hero.hero-photo .hero-content{padding:90px 30px 28px!important}}
+@media(max-width:380px){.hero.hero-photo{min-height:330px}.hero.hero-photo .hero-content{padding:80px 15px 20px!important}.hero.hero-photo .hero-eggfree{max-width:135px!important;font-size:9px!important}}
+/* Drink size is chosen before adding to cart, not hidden in checkout */
+.product-drink-size{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 10px;border:1px solid #eadfd5;border-radius:10px;margin:6px 0 8px;background:#fff9f4;font-size:13px;font-weight:650}
+.product-drink-size select{width:auto;min-width:110px;max-width:55%;background:white;color:#201814;border:1px solid #dec8b7;border-radius:9px;padding:9px;font-size:14px}
