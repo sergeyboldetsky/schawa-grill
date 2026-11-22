@@ -1,1 +1,8 @@
-Schawa Grill V13. Upload all files to GitHub Pages root. Images are local. WhatsApp phone number remains unset in assets/app.js (CONFIG.whatsappNumber). Menu prices and approximate weights are DEMO values and must be verified. WhatsApp chat does not automatically reveal a customer phone number to the website; order is sent only after the user presses Send in WhatsApp.
+Schawa Grill V13.4
+
+- Mandatory lavash/meat green with checkmarks.
+- Dine-in/takeaway selection added to WhatsApp order.
+- Drink card images updated using the existing food-photo composition.
+- Egg-free garlic sauce copy simplified.
+
+Demo only: WhatsApp number, opening hours, legal information, and actual on-site seating availability remain unconfirmed.

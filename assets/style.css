@@ -202,3 +202,13 @@ footer{background:#fffaf5;border-top:1px solid #eee0d3;padding-top:28px!importan
 .hero.hero-photo{position:relative}
 .hero-eggfree{position:absolute;right:12px;top:12px;z-index:2;max-width:170px;background:rgba(255,249,235,.95);border:1px solid #f0d2a7;color:#6e2f16;padding:7px 9px;border-radius:999px;font-size:10px;font-weight:800;line-height:1.2;box-shadow:0 2px 8px #0003}
 @media(max-width:380px){.top #menuBtn{width:52px!important;min-width:52px!important}.hero-eggfree{right:8px;top:9px;font-size:9px;padding:6px 8px;max-width:135px}.cart-line .extras-rows .extra-row{padding:6px!important}.cart-line .extras-rows .extra-row span{font-size:10px!important}.cart-line .extras-rows .extra-row small{font-size:9px!important}}
+
+/* V13.4: mandatory ingredients are included, visually selected */
+.cart-line .ingredient-toggle:has(input:disabled){background:#eaf8ef!important;border:1px solid #a7d8b7!important;opacity:1!important;color:#174b31!important;cursor:default!important}
+.cart-line .ingredient-toggle:has(input:disabled)::after{content:'✓'!important;position:absolute!important;right:2px!important;top:2px!important;width:13px!important;height:13px!important;line-height:13px!important;border-radius:50%!important;background:#288e55!important;color:#fff!important;text-align:center!important;font-size:9px!important;font-weight:900!important}
+.order-mode{border:0;padding:0;margin:12px 0 18px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;min-width:0}
+.order-mode legend{font-weight:750;margin-bottom:9px;font-size:14px;color:#231b18}
+.order-mode .mode-choice{display:flex;align-items:center;gap:8px;padding:12px 10px;min-height:48px;border:1px solid #e7d5c9;border-radius:12px;background:#fff;cursor:pointer;font-size:13px;font-weight:650;min-width:0}
+.order-mode .mode-choice:has(input:checked){border-color:#94cba9;background:#edf8f0;color:#1a5834}
+.order-mode input{accent-color:#288e55;flex:none;width:18px;height:18px;margin:0}
+@media(max-width:350px){.order-mode .mode-choice{font-size:11px;padding:10px 7px}}
