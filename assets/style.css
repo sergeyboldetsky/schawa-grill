@@ -285,3 +285,12 @@ button,a,[role="button"],input[type="button"]{-webkit-tap-highlight-color:transp
 .extra-row span{flex:1;min-width:0;font-size:11px!important;overflow-wrap:anywhere}
 .extra-row small{margin-left:auto!important;white-space:nowrap!important;font-size:10px!important}
 @media(max-width:390px){.extra-row{padding:8px 6px!important;gap:5px!important}.extra-row span{font-size:10px!important}.extra-row small{font-size:9px!important}}
+
+/* V13.10 — sticky header belongs to the centered 700px body, not viewport */
+@media (min-width:701px){
+  body > .top{position:sticky!important;top:0!important;left:auto!important;right:auto!important;transform:none!important;width:100%!important;max-width:700px!important;margin:0 auto!important;}
+}
+.product{position:relative}
+.spicy-badge{position:absolute;right:12px;top:10px;z-index:2;border:1px solid #f0b7a0;border-radius:999px;background:#fff0e6;color:#9d2810;font-size:11px;font-weight:800;padding:3px 9px;line-height:1.4}
+.product:has(.spicy-badge) .product-main{padding-right:82px}
+@media(max-width:390px){.spicy-badge{right:9px;top:7px;font-size:10px;padding:2px 7px}.product:has(.spicy-badge) .product-main{padding-right:68px}}

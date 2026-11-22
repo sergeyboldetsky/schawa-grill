@@ -1,1 +1,1 @@
-Schawa Grill V13.9: redesigned mobile navigation with icons; circular header map; optional cheese, pineapple, corn moved to extras rows; full-width order buttons beneath ingredients. Google Maps address remains pending.
+Schawa Grill V13.10: fixed desktop sticky header inside 700px centered site; Shawarma Scharf 10,00 EUR and spicy badge. Upload all files to GitHub Pages.
