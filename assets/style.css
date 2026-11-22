@@ -229,3 +229,26 @@ body:has(#menu.page.active) .quick-menu{display:none}
 .cart-line .ingredient-toggle:has(input:disabled)::after{content:none!important;display:none!important}
 .ingredient-lock{position:absolute!important;top:3px!important;right:3px!important;z-index:4!important;font-size:9px!important;line-height:1!important;padding:1px!important;background:#fff7e8!important;border:1px solid #ead7b4!important;border-radius:4px!important;box-shadow:0 1px 2px #0001!important}
 .product .ingredient:has(.ingredient-lock),.cart-line .ingredient.mandatory{padding-top:7px!important}
+
+/* V13.7 — iPhone polish, parking, flexible shawarma */
+html,body{max-width:100%;overflow-x:clip}main,.page,.content,.home-actions,.products,.product{min-width:0;max-width:100%}
+button,a,[role="button"],input[type="button"]{-webkit-tap-highlight-color:transparent}button,button:visited,a,a:visited{color:inherit}button{appearance:none;-webkit-appearance:none}
+.tabs,.home-tabs{max-width:100%;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.tabs button,.home-tabs button{color:#201814!important}.tabs button.selected,.home-tabs button.selected{color:white!important}
+.top{grid-template-columns:110px minmax(0,1fr) auto!important;position:sticky!important;top:0!important;max-width:100%;overflow:visible}
+.top #menuBtn{width:61px!important;min-width:61px!important;grid-column:1;justify-self:start;z-index:3}
+.top .header-map{position:absolute;left:69px;top:50%;transform:translateY(-50%);width:30px;height:34px;border:0;border-radius:9px;background:transparent;display:grid;place-items:center;padding:3px;color:#201814;z-index:3}
+.top .brand{position:absolute!important;left:50%!important;top:5px!important;transform:translateX(-50%)!important;grid-column:auto!important;z-index:2}
+.top .header-right{grid-column:3;justify-self:end;z-index:3}
+@media(max-width:375px){.top{grid-template-columns:99px minmax(0,1fr) auto!important}.top #menuBtn{width:49px!important;min-width:49px!important}.top .header-map{left:51px;width:27px}.top .brand img{width:48px;height:48px}.top .shop-status{max-width:63px;font-size:8px}.top .header-right{gap:3px}}
+.parking-card{display:flex;align-items:center;gap:10px;margin:12px 0 5px;padding:11px 12px;background:#f0faf3;border:1px solid #b9dfc5;border-radius:14px;color:#17452a;min-width:0}
+.parking-visual{width:83px;min-width:83px}.parking-visual svg{display:block;width:100%;height:auto}.parking-copy{min-width:0;display:flex;flex-direction:column;gap:2px}.parking-copy strong{font-size:13px;line-height:1.3}.parking-copy span{font-size:10px;line-height:1.4;color:#476654}
+@media(max-width:360px){.parking-visual{width:65px;min-width:65px}.parking-copy strong{font-size:12px}}
+/* Ingredients not in the base recipe can be added for the listed extra price. */
+.cart-line .ingredient-addable:not(:has(input:checked)){background:#fffdfb!important;border:1px dashed #e4c7b6!important}
+.cart-line .ingredient-addable:has(input:checked){background:#eaf8ef!important;border:1px solid #a7d8b7!important}
+.ingredient-price{display:block;font-size:8px;color:#a51320;font-weight:800;line-height:1}.ingredient-optional{position:absolute;top:3px;left:3px;font-size:7px;color:#8b6959;font-weight:800}
+.cart-line .ingredient-addable .ingredient-label{padding-top:2px}
+.cart-line .ingredient-toggle:has(input:disabled)::after{display:none!important;content:none!important}
+.floating-preorder{max-width:min(540px,calc(100vw - 28px));bottom:calc(14px + env(safe-area-inset-bottom))!important}
+@media(max-width:450px){.hero-photo h1{font-size:clamp(38px,10vw,52px)!important;overflow-wrap:normal;letter-spacing:-1.5px!important}.hero-photo .hero-content{padding-left:18px!important;padding-right:18px!important}.hero-photo p{max-width:245px}}
