@@ -14,7 +14,9 @@ const products=[
 {id:'shrimp',name:'Frittierte Garnelen',desc:'Knusprige Garnelen',price:8,category:'sides',image:'snack-shrimp.webp'},
 {id:'water',name:'Mineralwasser',desc:'0,5 l · still oder sprudelnd',price:2.5,category:'drinks',image:'water-black.webp'},
 {id:'cola',name:'Coca-Cola',desc:'0,5 l',price:2.5,category:'drinks',image:'cola-black.webp'},
-{id:'sprite',name:'Sprite',desc:'0,5 l',price:2.5,category:'drinks',image:'sprite-black.webp'}
+{id:'sprite',name:'Sprite',desc:'0,5 l',price:2.5,category:'drinks',image:'sprite-black.webp'},
+{id:'coffee',name:'Kaffee',desc:'250 ml',price:2.5,category:'drinks',image:'coffee.webp'},
+{id:'tea',name:'Tee',desc:'250 ml',price:2,category:'drinks',image:'tea.webp'}
 ];
 const ingredients=[['lavash','ingredient-lavash.webp','Armenischer Lavash'],['meat','ingredient-meat.webp','Hähnchenfleisch'],['tomato','ingredient-tomato.webp','Tomaten'],['carrot','ingredient-carrot.webp','Koreanische Karotten'],['cabbage','ingredient-cabbage.webp','Weißkohl'],['pickle','ingredient-pickle.webp','Salzgurken'],['fries','ingredient-fries.webp','Kartoffeln'],['sauce','ingredient-sauce.webp','Knoblauchsoße'],['cheese','ingredient-cheese.webp','Käse'],['pineapple','ingredient-pineapple.webp','Ananas'],['corn','ingredient-corn.webp','Mais'],['mushroom','ingredient-mushroom.webp','Marinierte Champignons']];
 const extrasPhotos={onion:'ingredient-onion.webp',meat:'ingredient-meat.webp',sauce:'ingredient-sauce.webp',cheese:'ingredient-cheese.webp',hot:'ingredient-hot.svg'};

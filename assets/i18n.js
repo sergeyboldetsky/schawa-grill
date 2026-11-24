@@ -1,6 +1,7 @@
 /* Schawa Grill V15: DE / RU UI language. German remains the canonical order data. */
 (()=>{'use strict';
 const translations={
+'Kaffee':'Кофе','Tee':'Чай','250 ml':'250 мл',
 'Menü':'Меню','Schließen':'Закрыть','Eröffnung folgt':'Скоро открытие','Startseite':'Главная','Speisekarte':'Меню','Vorbestellen':'Предзаказ','Über uns':'О нас','Kontakt & Anfahrt':'Контакты и маршрут','Datenschutz':'Конфиденциальность','Datenschutz (Entwurf)':'Конфиденциальность (проект)',
 'AUS ODESSA · MIT LIEBE':'ИЗ ОДЕССЫ · С ЛЮБОВЬЮ','FRISCH & LECKER':'СВЕЖО И ВКУСНО','EXPRESS SERVICE':'БЫСТРЫЙ ЗАКАЗ','UNSERE GESCHICHTE':'НАША ИСТОРИЯ','WIR SEHEN UNS BALD':'СКОРО УВИДИМСЯ','RECHTLICHES':'ПРАВОВАЯ ИНФОРМАЦИЯ',
 'Frische Shawarma, hausgemachte Knoblauchsoße und richtig guter Geschmack.':'Свежая шаурма, домашний чесночный соус и настоящий вкус.','Unsere Knoblauchsoße – ohne Ei':'Наш чесночный соус — без яиц','Knoblauchsoße ohne Ei':'Чесночный соус без яиц','Ohne Ei – unsere Knoblauchsoße!':'Наш чесночный соус — без яиц!','Unsere Knoblauchsoße':'Наш чесночный соус','Mit dem Auto? Kein Problem!':'На машине? Без проблем!','Parkplätze am geplanten Standort vorgesehen. Genaue Adresse und Parkmöglichkeiten bestätigen wir vor der Eröffnung.':'На планируемом месте предусмотрена парковка. Точный адрес и условия парковки подтвердим перед открытием.',
