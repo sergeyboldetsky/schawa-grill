@@ -9,3 +9,5 @@
 
 /* V15.9.4: two-tap order actions */
 .ticket{touch-action:manipulation;cursor:pointer;position:relative}.ticket.tap-selected{outline:3px solid #16754b;outline-offset:-3px;background:#f0faf4}.tap-hint{position:absolute;left:8px;right:8px;bottom:8px;pointer-events:none;background:#124b34;color:#fff;border-radius:8px;padding:10px;text-align:center;font-weight:750;box-shadow:0 2px 8px #0002}
+
+.no-show{width:100%;min-height:52px;margin-top:8px;border:1px solid #dc2626;color:#b91c1c;background:#fff;border-radius:10px;font-weight:700;font-size:16px}.no-show[hidden]{display:none!important}
