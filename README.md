@@ -17,3 +17,5 @@ Kitchen terminal: larger high-contrast current time display. No changes to order
 Kitchen: two taps on the same order card within 2 seconds advance its status; single tap highlights it. Existing buttons remain unchanged.
 
 V15.9.7: kitchen cooking totals, local load presets, offline shell cache. No server sync.
+
+V15.9.8: kitchen load colors, backdrop dismissal, network icon and local product availability list. No server synchronization.
