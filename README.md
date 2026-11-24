@@ -7,3 +7,5 @@ Admin > Продажи фудтрака: fictional POS sales, hourly bars, weekd
 V15.9: standalone kitchen/ terminal, local demo queue, sound after user activation. No backend or SMS.
 
 V15.9.1: scheduled kitchen orders, preparation reminder 10 minutes before pickup; accelerated demo reminder after 15 seconds.
+
+V15.9.2: Kitchen order source and fulfillment badges, demo customer identity, removed minimum pickup selector; regular demo pickup in 40 minutes. Existing orders retain their data.
