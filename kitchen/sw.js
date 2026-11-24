@@ -1,5 +1,5 @@
-const CACHE='schawa-kitchen-1598';
-const files=['./','./index.html','./kitchen.css?v=1598','./kitchen.js?v=1598','../assets/logo.jpg'];
+const CACHE='schawa-kitchen-1599';
+const files=['./','./index.html','./kitchen.css?v=1599','./kitchen.js?v=1599','../assets/logo.jpg'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(files)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('schawa-kitchen-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',e=>{if(e.request.method!=='GET'||new URL(e.request.url).origin!==self.location.origin)return;if(e.request.mode==='navigate'){e.respondWith(fetch(e.request).catch(()=>caches.match('./index.html')));return;}e.respondWith(caches.open(CACHE).then(c=>c.match(e.request)).then(r=>r||fetch(e.request)));});
