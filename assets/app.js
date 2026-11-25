@@ -189,3 +189,6 @@ document.getElementById('headerMap')?.addEventListener('click',()=>alert('Der St
 
 // Informational notice: site uses localStorage for cart and language; no tracking cookies are set by this code.
 try{if(localStorage.getItem('schawa-cookie-notice-seen')==='1')document.querySelector('#storageNotice')?.remove()}catch(_){}
+
+function refreshKitchenWarning(){const target=document.querySelector('.pickup-field');if(!target)return;let el=document.getElementById('kitchenLoadWarning');if(!el){el=document.createElement('div');el.id='kitchenLoadWarning';el.setAttribute('role','status');target.before(el)}const l=SchawaLoad.read().level;el.hidden=l==='normal';el.dataset.level=l;const title=l==='high'?tr('Küche stark ausgelastet','Сейчас высокая загрузка кухни'):tr('Viele Bestellungen','Сейчас много заказов');const msg=tr('Die Zubereitung kann länger dauern als gewöhnlich. Vielen Dank für deine Geduld!','Приготовление может занять больше времени, чем обычно. Спасибо за терпение!');const text=title+' · '+msg;if(el.textContent!==text)el.textContent=text;}
+refreshKitchenWarning();setInterval(refreshKitchenWarning,1000);window.addEventListener('storage',refreshKitchenWarning);

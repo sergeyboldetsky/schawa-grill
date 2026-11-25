@@ -436,3 +436,5 @@ body.has-active-order #drawer button[data-page="order"]{display:flex!important;j
 body.has-active-order #drawer button[data-page="order"] .nav-symbol{background:#c5e8d3!important;color:#14643d!important}
 body.has-active-order #drawer button[data-page="order"] .nav-symbol svg{stroke:currentColor!important}
 body.has-active-order #drawer button[data-page="order"] .nav-arrow{display:none!important}
+
+#kitchenLoadWarning{margin:0 0 14px;padding:14px;border-radius:12px;background:#fff2cf;color:#805000;font-weight:600;line-height:1.5}#kitchenLoadWarning[data-level="high"]{background:#fee2e2;color:#991b1b}#kitchenLoadWarning[hidden]{display:none!important}
