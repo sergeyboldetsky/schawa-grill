@@ -429,3 +429,10 @@ body:has(.bottom-bar.visible) footer{padding-bottom:175px!important}
 .drawer button[data-active-label="1"]{justify-content:center!important;text-align:center!important;background:#dff3e7!important;color:#14643d!important;border-color:#83c5a2!important}
 .drawer button[data-active-label="1"] .nav-symbol{background:#c5e8d3;color:#14643d}
 .drawer button[data-active-label="1"] .nav-symbol svg{stroke:currentColor}
+
+/* V15.10.16 */
+.product-summary .product-toggle-label{bottom:14px!important}
+body.has-active-order #drawer button[data-page="order"]{display:flex!important;justify-content:center!important;text-align:center!important;background:#dff3e7!important;color:#14643d!important;border-color:#83c5a2!important;min-height:63px!important}
+body.has-active-order #drawer button[data-page="order"] .nav-symbol{background:#c5e8d3!important;color:#14643d!important}
+body.has-active-order #drawer button[data-page="order"] .nav-symbol svg{stroke:currentColor!important}
+body.has-active-order #drawer button[data-page="order"] .nav-arrow{display:none!important}

@@ -127,7 +127,7 @@ function syncActiveOrder(){
  $('#receipt').hidden=!active;document.querySelectorAll('dialog[open]').forEach(d=>{if(d.id==='receipt')d.close()});$('#orderForm').hidden=active;$('#order .cart-panel').hidden=active;$('#order .order-head').hidden=active;
  document.querySelectorAll('[data-page="order"]').forEach(b=>{
   if(!orderButtons.has(b))orderButtons.set(b,b.innerHTML);
-  if(active){if(!b.dataset.activeLabel){b.dataset.activeLabel='1';b.innerHTML=b.closest('#drawer')?'<span class="nav-symbol"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V2h6v2M9 12l2 2 4-4"/></svg></span><span>Bestellung ansehen</span>':'<span>Bestellung ansehen</span><b aria-hidden="true">›</b>'}}
+  if(active){if(!b.dataset.activeLabel|| (b.closest('#drawer')&&!b.querySelector('.nav-symbol'))){b.dataset.activeLabel='1';b.innerHTML=b.closest('#drawer')?'<span class="nav-symbol"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V2h6v2M9 12l2 2 4-4"/></svg></span><span>Bestellung ansehen</span>':'<span>Bestellung ansehen</span><b aria-hidden="true">›</b>'}}
   else if(b.dataset.activeLabel){delete b.dataset.activeLabel;b.innerHTML=orderButtons.get(b)}
  });
  if(active)showReceipt(false);else{receiptPrevious='';$('#receiptBody').innerHTML=''}
