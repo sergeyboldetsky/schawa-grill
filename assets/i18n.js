@@ -1,6 +1,7 @@
 /* Schawa Grill V15: DE / RU UI language. German remains the canonical order data. */
 (()=>{'use strict';
 const translations={
+'Ich bin unterwegs · Jetzt vorbestellen':'Я в пути · Предзаказать','3 · Bestellen':'3 · Заказать','Jetzt bestellen':'Заказать','Meine Bestellung':'Мой заказ','Bestellnummer speichern (PNG)':'Сохранить номер (PNG)','Demo: Bestellung nur in diesem Browser. Zahlung vor Ort. Abholzeit nach Bestätigung.':'Демо: заказ только в этом браузере. Оплата на месте. Время после подтверждения.', 
 'Kaffee':'Кофе','Tee':'Чай','250 ml':'250 мл',
 'Menü':'Меню','Schließen':'Закрыть','Eröffnung folgt':'Скоро открытие','Startseite':'Главная','Speisekarte':'Меню','Vorbestellen':'Предзаказ','Über uns':'О нас','Kontakt & Anfahrt':'Контакты и маршрут','Datenschutz':'Конфиденциальность','Datenschutz (Entwurf)':'Конфиденциальность (проект)',
 'AUS ODESSA · MIT LIEBE':'ИЗ ОДЕССЫ · С ЛЮБОВЬЮ','FRISCH & LECKER':'СВЕЖО И ВКУСНО','EXPRESS SERVICE':'БЫСТРЫЙ ЗАКАЗ','UNSERE GESCHICHTE':'НАША ИСТОРИЯ','WIR SEHEN UNS BALD':'СКОРО УВИДИМСЯ','RECHTLICHES':'ПРАВОВАЯ ИНФОРМАЦИЯ',
