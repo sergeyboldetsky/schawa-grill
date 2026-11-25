@@ -422,3 +422,10 @@ body:has(.bottom-bar.visible) footer{padding-bottom:175px!important}
 
 /* V15.3: Informational local storage notice only */
 .storage-notice{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);z-index:9999;width:min(680px,calc(100% - 24px));display:flex;gap:12px;align-items:center;background:#fff;color:#242424;box-shadow:0 8px 35px #0004;border:1px solid #dedede;border-radius:16px;padding:13px 15px}.storage-notice strong{font-size:14px}.storage-notice p{font-size:12px;line-height:1.45;margin:5px 0 0}.storage-notice a{color:#b31222}.storage-notice button{flex:none;border:0;border-radius:10px;background:#1e8c4b;color:white;font-weight:700;padding:11px 13px}@media(max-width:460px){.storage-notice{display:block}.storage-notice button{width:100%;margin-top:10px}}
+
+/* V15.10.15 */
+.product-toggle-label{bottom:14px!important}
+.menu-glyph svg{width:24px;height:24px;display:block;margin:auto}
+.drawer button[data-active-label="1"]{justify-content:center!important;text-align:center!important;background:#dff3e7!important;color:#14643d!important;border-color:#83c5a2!important}
+.drawer button[data-active-label="1"] .nav-symbol{background:#c5e8d3;color:#14643d}
+.drawer button[data-active-label="1"] .nav-symbol svg{stroke:currentColor}
