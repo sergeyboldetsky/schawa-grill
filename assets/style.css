@@ -464,3 +464,23 @@ body.has-active-order footer{padding-bottom:120px}
 
 /* V15.10.24 */
 .cart-addons{margin:14px 0;padding:12px;background:#171717;border:1px solid #333;border-radius:14px;color:#fff}.cart-addons h3{margin:0 0 10px;font-size:18px}.addon-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.addon-card{min-width:0;display:flex;flex-direction:column;align-items:stretch;gap:5px;background:#222;color:#fff;border:1px solid #444;border-radius:10px;padding:7px;text-align:left}.addon-card img{width:100%;aspect-ratio:1;object-fit:contain;background:#000;border-radius:7px}.addon-card strong{font-size:12px;overflow-wrap:anywhere}.addon-card span{display:flex;align-items:center;justify-content:space-between;font-size:12px;margin-top:auto}.addon-card b{display:grid;place-items:center;background:#16754b;border-radius:8px;width:32px;height:32px;font-size:23px}.order-countdown{padding:12px;margin:8px 0;text-align:center;background:#e1f3e8;color:#165b3a;border-radius:10px;font-weight:800;font-variant-numeric:tabular-nums}.ready-optin{display:block;width:100%;padding:12px;border:1px solid #16754b;background:#fff;color:#16754b;border-radius:10px;margin:8px 0}.ready-notice{position:fixed;z-index:9999;top:12px;left:50%;transform:translateX(-50%);width:min(94%,480px);padding:18px 44px 18px 18px;background:#16754b;color:#fff;border-radius:15px;box-shadow:0 8px 30px #0008}.ready-notice strong{font-size:20px}.ready-notice p{margin:8px 0}.ready-notice button{background:#fff;color:#165b3a;border:0;border-radius:8px;padding:10px;font-weight:700}.ready-notice #readyNoticeClose{position:absolute;right:8px;top:8px}.cart-addons[hidden],.ready-notice[hidden],.ready-optin[hidden]{display:none!important}
+
+/* V15.10.25: compact cart extras and ready notification */
+.cart-addons{padding:12px 0 10px 10px;background:#fff;color:#211e1b;border:1px solid #e4ded7;min-width:0;overflow:hidden}
+.cart-addons h3{font-size:15px;margin:0 10px 9px 0}
+.addon-grid{display:flex;gap:6px;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scroll-snap-type:x proximity;scrollbar-width:thin;scrollbar-color:#b7c8bd transparent;padding:0 10px 6px 0;scroll-padding-inline-start:0;touch-action:pan-x pan-y}
+.addon-card{flex:0 0 calc((100% - 24px)/4.5);scroll-snap-align:start;min-width:0;padding:4px;gap:4px;background:#f7f5f1;color:#211e1b;border:1px solid #e3ded7;border-radius:9px;box-sizing:border-box}
+.addon-card img{width:100%;aspect-ratio:1;object-fit:contain;border-radius:5px}
+.addon-card strong{font-size:clamp(9px,2.2vw,12px);line-height:1.15;min-height:2.3em;overflow-wrap:anywhere}
+.addon-card span{font-size:clamp(9px,2.1vw,12px);gap:2px;white-space:nowrap}
+.addon-card b{width:22px;height:22px;flex:0 0 22px;border-radius:6px;font-size:17px;color:#fff}
+.ready-notice{top:max(12px,env(safe-area-inset-top));width:min(calc(100% - 24px),460px);box-sizing:border-box;display:grid;grid-template-columns:42px minmax(0,1fr);gap:12px;padding:16px 38px 16px 14px;background:#fff;color:#183c2a;border:1px solid #c9e5d4;border-radius:18px;box-shadow:0 12px 36px #142d2438;animation:ready-slide-in .35s ease-out both}
+.ready-notice-icon{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;background:#e0f3e7;color:#16754b;animation:ready-check-in .5s ease-out both}
+.ready-notice-icon svg{width:25px;height:25px}
+.ready-notice strong{font-size:17px;line-height:1.2;display:block}
+.ready-notice p{font-size:16px;font-weight:700;margin:6px 0 12px;line-height:1.35}
+.ready-notice #readyNoticeOpen{background:#16754b;color:#fff;border-radius:9px;padding:10px 12px;font-size:13px;min-height:40px;width:100%;text-align:center}
+.ready-notice #readyNoticeClose{right:7px;top:7px;width:30px;height:30px;padding:0;background:#f0f4f1;color:#355343;border-radius:50%;font-size:20px;line-height:1}
+@keyframes ready-slide-in{from{opacity:0;transform:translate(-50%,-15px)}to{opacity:1;transform:translate(-50%,0)}}
+@keyframes ready-check-in{from{transform:scale(.6)}to{transform:scale(1)}}
+@media(prefers-reduced-motion:reduce){.ready-notice,.ready-notice-icon{animation:none}}
