@@ -139,8 +139,9 @@ function syncActiveOrder(){
   const key=[o.id,o.status,ru()].join('|');
   if(fixed.dataset.statusKey!==key){
    fixed.dataset.statusKey=key;fixed.dataset.stage=o.status;
-   const icon=({new:'◷',waiting:'✓',due:'✓',cooking:'♨',ready:'✓'})[o.status]||'•';
-   fixed.innerHTML=`<span class="fixed-order-icon" aria-hidden="true">${icon}</span><span class="fixed-order-copy"><strong>${tr('Bestellung ansehen','Посмотреть заказ')}</strong><small role="status">${esc(receiptStatus(o))}</small></span><b aria-hidden="true">›</b>`;
+   const paths={new:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',waiting:'<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>',cooking:'<path class="fixed-steam" d="M8 8c-3-3 3-3 0-6m4 6c-3-3 3-3 0-6m4 6c-3-3 3-3 0-6"/><path d="M4 12h16v4a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5zm-2 2h2m16 0h2M3 10h18"/>',ready:'<path d="M5 7h14l2 14H3L5 7Zm4 0V5a3 3 0 0 1 6 0v2m-6 7 2 2 4-4"/>'};
+   const icon=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${paths[o.status==='due'?'waiting':o.status]||paths.new}</svg>`;
+   fixed.innerHTML=`<span class="fixed-order-icon" aria-hidden="true">${icon}</span><span class="fixed-order-copy"><strong>${tr('Bestellung ansehen','Посмотреть заказ')}</strong><small role="status"><span class="fixed-order-number">#${esc(String(o.id).slice(-6))}</span><span>${esc(receiptStatus(o))}</span></small></span><b aria-hidden="true">›</b>`;
   }
  }else{delete fixed.dataset.statusKey;delete fixed.dataset.stage;}
  if(active)showReceipt(false);else{receiptPrevious='';$('#receiptBody').innerHTML=''}
