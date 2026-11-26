@@ -79,7 +79,7 @@ function renderMenu(){
  <span class="product-main"><span class="product-name">${esc(p.name)}</span><span class="product-description">${esc(p.desc)}</span><span class="price">${euro(p.price)}</span></span>
  ${isShawarma(p)?'<span class="product-toggle-label">Zutaten ansehen <span class="product-toggle-chevron" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></span>':''}
  </button>
- ${isShawarma(p)?`<div class="product-ingredients" hidden>${ingredientsHtml(null,false,p)}</div>`:''}${allergenHtml(p)}
+ ${isShawarma(p)?`<div class="product-ingredients" hidden>${ingredientsHtml(null,false,p)}${allergenHtml(p)}</div>`:allergenHtml(p)}
  <button type="button" class="product-order-btn" data-add="${p.id}" ${productUnavailable(p)?'disabled':''} aria-label="${esc(p.name)} bestellen">${productUnavailable(p)?stockLabel():isShawarma(p)?'🌯 Jetzt bestellen':'＋ Hinzufügen'} <span aria-hidden="true">›</span></button>
  </article>`).join('');
  $('#products').innerHTML=html;$('#homeProducts').innerHTML=html;
