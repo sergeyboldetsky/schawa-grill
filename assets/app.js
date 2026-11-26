@@ -134,6 +134,15 @@ function syncActiveOrder(){
   if(active){if(!b.dataset.activeLabel|| (b.closest('#drawer')&&!b.querySelector('.nav-symbol'))){b.dataset.activeLabel='1';b.innerHTML=b.closest('#drawer')?'<span class="nav-symbol"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V2h6v2M9 12l2 2 4-4"/></svg></span><span>Bestellung ansehen</span>':'<span>Bestellung ansehen</span><b aria-hidden="true">›</b>'}}
   else if(b.dataset.activeLabel){delete b.dataset.activeLabel;b.innerHTML=orderButtons.get(b)}
  });
+ const fixed=$('#floatingPreorder');
+ if(active){
+  const key=[o.id,o.status,ru()].join('|');
+  if(fixed.dataset.statusKey!==key){
+   fixed.dataset.statusKey=key;fixed.dataset.stage=o.status;
+   const icon=({new:'◷',waiting:'✓',due:'✓',cooking:'♨',ready:'✓'})[o.status]||'•';
+   fixed.innerHTML=`<span class="fixed-order-icon" aria-hidden="true">${icon}</span><span class="fixed-order-copy"><strong>${tr('Bestellung ansehen','Посмотреть заказ')}</strong><small role="status">${esc(receiptStatus(o))}</small></span><b aria-hidden="true">›</b>`;
+  }
+ }else{delete fixed.dataset.statusKey;delete fixed.dataset.stage;}
  if(active)showReceipt(false);else{receiptPrevious='';$('#receiptBody').innerHTML=''}
  if(returnHome)go('home');
 }

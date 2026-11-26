@@ -440,3 +440,15 @@ body.has-active-order #drawer button[data-page="order"] .nav-arrow{display:none!
 #kitchenLoadWarning{margin:0 0 14px;padding:14px;border-radius:12px;background:#fff2cf;color:#805000;font-weight:600;line-height:1.5}#kitchenLoadWarning[data-level="high"]{background:#fee2e2;color:#991b1b}#kitchenLoadWarning[hidden]{display:none!important}
 
 .product[data-stock-off=true],.home-product.stock-unavailable{background:#eee!important;filter:grayscale(1)}.product[data-stock-off=true] .product-order-btn,.home-product.stock-unavailable{background:#ddd!important;color:#666!important;cursor:not-allowed;opacity:.85}.stock-cart-warning{color:#a52b22;font-weight:700}.extra-row:has(input:disabled),.ingredient-toggle:has(input:disabled):not(.mandatory){opacity:.45;filter:grayscale(1)}
+
+/* V15.10.21: active order shortcut only */
+body.has-active-order #floatingPreorder{min-height:72px;padding:10px 42px 10px 14px;gap:12px;justify-content:center;box-sizing:border-box;animation:fixed-order-pulse 2.8s ease-in-out infinite;background:#16754b!important}
+body.has-active-order #floatingPreorder[data-stage="ready"]{background:#11663e!important;animation-duration:1.7s}
+.fixed-order-icon{display:grid;place-items:center;width:40px;height:40px;flex:none;border-radius:50%;background:#ffffff26;color:white;font-size:25px;line-height:1;animation:fixed-order-icon 2s ease-in-out infinite}
+.fixed-order-copy{display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;min-width:0;line-height:1.2}
+.fixed-order-copy strong{font-size:16px;font-weight:850}.fixed-order-copy small{font-size:13px;font-weight:650;color:#fff;opacity:.95}
+body.has-active-order:not(:has(#order.active)) .quick-menu{bottom:calc(102px + env(safe-area-inset-bottom))!important}
+body.has-active-order footer{padding-bottom:120px}
+@keyframes fixed-order-pulse{0%,100%{box-shadow:0 5px 18px #145b3a44,0 0 0 0 #2ca76b44}50%{box-shadow:0 5px 18px #145b3a55,0 0 0 6px #2ca76b22}}
+@keyframes fixed-order-icon{50%{transform:scale(1.09)}}
+@media(prefers-reduced-motion:reduce){body.has-active-order #floatingPreorder,.fixed-order-icon{animation:none!important}}
