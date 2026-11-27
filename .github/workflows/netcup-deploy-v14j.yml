@@ -1,0 +1,90 @@
+name: Schawa Grill - Netcup V1.4J fix
+on:
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: 'Upload V1.4J fix? (unchecked = read-only)'
+        required: true
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: schawa-netcup-deploy
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Verify package
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s deploy/v1.4j/httpdocs/assets/staff-native.js
+          test -s deploy/v1.4j/private/interfaces/cook.php
+          test -s deploy/v1.4j/private/interfaces/kitchen.php
+          node --check deploy/v1.4j/httpdocs/assets/staff-native.js
+          php -l deploy/v1.4j/private/interfaces/cook.php
+          php -l deploy/v1.4j/private/interfaces/kitchen.php
+      - name: Check server paths
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          script_stop: true
+          script: |
+            set -eu
+            B=/hosting257022.af9b8.netcup.net
+            test -f "$B/httpdocs/assets/staff-native.js"
+            test -f "$B/private/interfaces/cook.php"
+            test -f "$B/private/interfaces/kitchen.php"
+            test -f "$B/private/auth.php"
+            echo 'Paths OK; no changes yet.'
+      - name: Upload staged files
+        if: ${{ inputs.deploy == true }}
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          source: 'deploy/v1.4j/httpdocs/assets/staff-native.js,deploy/v1.4j/private/interfaces/cook.php,deploy/v1.4j/private/interfaces/kitchen.php'
+          target: '/hosting257022.af9b8.netcup.net/private/github-deploy-stage'
+          overwrite: true
+      - name: Backup and install only three files
+        if: ${{ inputs.deploy == true }}
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          script_stop: true
+          script: |
+            set -eu
+            B=/hosting257022.af9b8.netcup.net
+            S="$B/private/github-deploy-stage/deploy/v1.4j"
+            D="$B/private/github-deploy-backups/v1.4j-$(date +%Y%m%d-%H%M%S)"
+            FILES='httpdocs/assets/staff-native.js private/interfaces/cook.php private/interfaces/kitchen.php'
+            for f in $FILES; do
+              test -s "$S/$f"
+              test -f "$B/$f"
+              test ! -L "$B/$f"
+            done
+            php -l "$S/private/interfaces/cook.php"
+            php -l "$S/private/interfaces/kitchen.php"
+            mkdir -p "$D"
+            for f in $FILES; do
+              mkdir -p "$D/$(dirname "$f")"
+              cp -p "$B/$f" "$D/$f"
+            done
+            echo "Backup: $D"
+            for f in $FILES; do
+              cp "$S/$f" "$B/$f"
+              echo "Installed: $f"
+            done
+            echo 'V1.4J installed'
