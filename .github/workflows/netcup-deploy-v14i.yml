@@ -1,0 +1,113 @@
+name: Schawa Grill - Netcup V1.4I deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: 'Actually upload V1.4I files? (false = read-only check)'
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: schawa-netcup-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact commit
+        uses: actions/checkout@v4
+
+      - name: Verify deploy package locally
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in \
+            deploy/v1.4i/httpdocs/assets/staff-native.js \
+            deploy/v1.4i/httpdocs/assets/staff-session.js \
+            deploy/v1.4i/private/interfaces/kitchen.php \
+            deploy/v1.4i/private/interfaces/cook.php; do
+            test -s "$file"
+            echo "Ready: $file"
+          done
+          if grep -R -n -E '(DB_PASSWORD|password[[:space:]]*=|BEGIN (RSA |OPENSSH )?PRIVATE KEY)' deploy/v1.4i; then
+            echo 'Potential secret found in deploy package; refusing deployment.' >&2
+            exit 1
+          fi
+
+      - name: Check Netcup paths (read only)
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          script_stop: true
+          script: |
+            set -eu
+            BASE=/hosting257022.af9b8.netcup.net
+            test -d "$BASE/httpdocs/assets"
+            test -d "$BASE/private/interfaces"
+            test -f "$BASE/private/config.php"
+            test -f "$BASE/private/auth.php"
+            test -f "$BASE/httpdocs/api/auth/index.php"
+            test -f "$BASE/private/interfaces/kitchen.php"
+            test -f "$BASE/private/interfaces/cook.php"
+            echo 'SSH and all expected paths: OK'
+            echo 'Read-only check completed.'
+
+      - name: Upload staged package (only when deploy=true)
+        if: ${{ inputs.deploy == true }}
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          source: 'deploy/v1.4i/httpdocs/assets/staff-native.js,deploy/v1.4i/httpdocs/assets/staff-session.js,deploy/v1.4i/private/interfaces/kitchen.php,deploy/v1.4i/private/interfaces/cook.php'
+          target: '/hosting257022.af9b8.netcup.net/private/github-deploy-stage'
+          overwrite: true
+
+      - name: Backup and install four allowlisted files
+        if: ${{ inputs.deploy == true }}
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          script_stop: true
+          command_timeout: 5m
+          script: |
+            set -eu
+            BASE=/hosting257022.af9b8.netcup.net
+            STAGE="$BASE/private/github-deploy-stage/deploy/v1.4i"
+            BACKUP="$BASE/private/github-deploy-backups/v1.4i-$(date +%Y%m%d-%H%M%S)"
+            FILES='httpdocs/assets/staff-native.js httpdocs/assets/staff-session.js private/interfaces/kitchen.php private/interfaces/cook.php'
+            for rel in $FILES; do
+              test -s "$STAGE/$rel" || { echo "Missing staged file: $rel"; exit 1; }
+              test -d "$(dirname "$BASE/$rel")" || exit 1
+              test ! -L "$BASE/$rel" || { echo "Symlink refused: $rel"; exit 1; }
+            done
+            php -l "$STAGE/private/interfaces/kitchen.php"
+            php -l "$STAGE/private/interfaces/cook.php"
+            mkdir -p "$BACKUP"
+            for rel in $FILES; do
+              mkdir -p "$BACKUP/$(dirname "$rel")"
+              if test -f "$BASE/$rel"; then
+                cp -p "$BASE/$rel" "$BACKUP/$rel"
+              fi
+            done
+            echo "Backup directory: $BACKUP"
+            for rel in $FILES; do
+              cp "$STAGE/$rel" "$BASE/$rel"
+              echo "Installed: $rel"
+            done
+            php -l "$BASE/private/interfaces/kitchen.php"
+            php -l "$BASE/private/interfaces/cook.php"
+            echo 'V1.4I deployment completed. MySQL and private/config.php untouched.'
