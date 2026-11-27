@@ -1,0 +1,84 @@
+name: Schawa Grill - Netcup V1.5 test website orders
+on:
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: 'Actually install V1.5? Unchecked = read-only verification'
+        type: boolean
+        required: true
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: schawa-netcup-deploy
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate package
+        run: |
+          set -euo pipefail
+          test -s deploy/v1.5/httpdocs/api/orders/create.php
+          test -s deploy/v1.5/httpdocs/assets/app.js
+          test -s deploy/v1.5/httpdocs/index.html
+          php -l deploy/v1.5/httpdocs/api/orders/create.php
+          node --check deploy/v1.5/httpdocs/assets/app.js
+          grep -Fq 'assets/app.js?v=150000' deploy/v1.5/httpdocs/index.html
+      - name: Check server paths (read only)
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          script_stop: true
+          script: |
+            set -eu
+            B=/hosting257022.af9b8.netcup.net
+            test -f "$B/httpdocs/api/orders/quote.php"
+            test -f "$B/httpdocs/api/orders/index.php"
+            test -f "$B/private/auth.php"
+            test -f "$B/httpdocs/assets/app.js"
+            test -f "$B/httpdocs/index.html"
+            test ! -L "$B/httpdocs/api/orders"
+            test ! -L "$B/httpdocs/assets/app.js"
+            test ! -L "$B/httpdocs/index.html"
+            echo 'Required files exist; no changes made'
+      - name: Upload staging package
+        if: ${{ inputs.deploy == true }}
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          source: 'deploy/v1.5/httpdocs/api/orders/create.php,deploy/v1.5/httpdocs/assets/app.js,deploy/v1.5/httpdocs/index.html'
+          target: '/hosting257022.af9b8.netcup.net/private/github-deploy-stage'
+          overwrite: true
+      - name: Backup and install V1.5
+        if: ${{ inputs.deploy == true }}
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          script_stop: true
+          script: |
+            set -eu
+            B=/hosting257022.af9b8.netcup.net
+            S="$B/private/github-deploy-stage/deploy/v1.5/httpdocs"
+            T="$B/httpdocs"
+            for f in api/orders/create.php assets/app.js index.html; do test -s "$S/$f"; done
+            php -l "$S/api/orders/create.php"
+            D="$B/private/github-deploy-backups/v1.5-$(date +%Y%m%d-%H%M%S)"
+            mkdir -p "$D/assets" "$D/api/orders"
+            cp -p "$T/assets/app.js" "$D/assets/app.js"
+            cp -p "$T/index.html" "$D/index.html"
+            if test -e "$T/api/orders/create.php"; then cp -p "$T/api/orders/create.php" "$D/api/orders/create.php"; fi
+            cp "$S/api/orders/create.php" "$T/api/orders/create.php"
+            cp "$S/assets/app.js" "$T/assets/app.js"
+            cp "$S/index.html" "$T/index.html"
+            echo "V1.5 installed. Backup: $D"
