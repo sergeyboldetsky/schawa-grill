@@ -1,0 +1,76 @@
+name: Schawa Grill - Netcup V1.8 Catalog and prices
+on:
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: 'Actually install V1.8? Unchecked = read-only verification'
+        type: boolean
+        required: true
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: schawa-netcup-deploy
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate package
+        run: node --check deploy/v1.8/httpdocs/assets/app.js
+      - name: Check server paths (read only)
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          script_stop: true
+          script: |
+            set -eu
+            B=/hosting257022.af9b8.netcup.net
+            test -f "$B/httpdocs/assets/app.js"; test ! -L "$B/httpdocs/assets/app.js"; test "$(sha256sum "$B/httpdocs/assets/app.js" | cut -d' ' -f1)" = ef4910fa9b8a9fe8deafd4001e5d595ed80e733118730fc1eaa7662eb1d505a4 || { echo "Unexpected version: httpdocs/assets/app.js"; exit 1; }
+            test -f "$B/httpdocs/index.html"; test ! -L "$B/httpdocs/index.html"; test "$(sha256sum "$B/httpdocs/index.html" | cut -d' ' -f1)" = a83dd5954f77fe47d821804098869ac1b0ee764742a429071b25a78de20e577e || { echo "Unexpected version: httpdocs/index.html"; exit 1; }
+      - name: Upload staging package
+        if: ${{ inputs.deploy == true }}
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          source: 'deploy/v1.8/httpdocs/assets/app.js,deploy/v1.8/httpdocs/index.html'
+          target: '/hosting257022.af9b8.netcup.net/private/github-deploy-stage'
+          overwrite: true
+      - name: Backup and install V1.8
+        if: ${{ inputs.deploy == true }}
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          script_stop: true
+          script: |
+            set -eu
+            B=/hosting257022.af9b8.netcup.net
+            test -f "$B/httpdocs/assets/app.js"; test ! -L "$B/httpdocs/assets/app.js"; test "$(sha256sum "$B/httpdocs/assets/app.js" | cut -d' ' -f1)" = ef4910fa9b8a9fe8deafd4001e5d595ed80e733118730fc1eaa7662eb1d505a4 || { echo "Unexpected version: httpdocs/assets/app.js"; exit 1; }
+            test -f "$B/httpdocs/index.html"; test ! -L "$B/httpdocs/index.html"; test "$(sha256sum "$B/httpdocs/index.html" | cut -d' ' -f1)" = a83dd5954f77fe47d821804098869ac1b0ee764742a429071b25a78de20e577e || { echo "Unexpected version: httpdocs/index.html"; exit 1; }
+            S="$B/private/github-deploy-stage/deploy/v1.8"
+            BK="$B/private/github-deploy-backups/v1.8-$(date +%Y%m%d-%H%M%S)"
+            test "$(sha256sum "$S/httpdocs/assets/app.js" | cut -d' ' -f1)" = 1c7e23d0fa076b8264ae28ff087fad6f7c227ae89632ec93cbf9dab3702f8fc1
+            mkdir -p "$BK/httpdocs/assets"
+            cp -p "$B/httpdocs/assets/app.js" "$BK/httpdocs/assets/app.js"
+            test "$(sha256sum "$S/httpdocs/index.html" | cut -d' ' -f1)" = 4019720a7557377655cbbc515986ec71c6e785492a0178aef4b22d28e9edf681
+            mkdir -p "$BK/httpdocs"
+            cp -p "$B/httpdocs/index.html" "$BK/httpdocs/index.html"
+            rollback() {
+              cp -p "$BK/httpdocs/assets/app.js" "$B/httpdocs/assets/app.js" || true
+              cp -p "$BK/httpdocs/index.html" "$B/httpdocs/index.html" || true
+            }
+            trap rollback EXIT
+            cp "$S/httpdocs/assets/app.js" "$B/httpdocs/assets/app.js"
+            cp "$S/httpdocs/index.html" "$B/httpdocs/index.html"
+            trap - EXIT
+            echo "V1.8 installed. Backup: $BK"

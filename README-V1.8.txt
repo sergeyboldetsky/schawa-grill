@@ -1,0 +1,1 @@
+V1.8 catalog and server base prices. Requires installed V1.7. Test mode only. No database migration. Recovery, ratings and history not included. New combo cards reuse existing product photos. Run workflow without deploy first.
