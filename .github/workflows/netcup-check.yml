@@ -1,0 +1,44 @@
+name: Netcup SSH connection check
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check SSH and site directory (read only)
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          timeout: 30s
+          command_timeout: 30s
+          script: |
+            set -eu
+            echo 'SSH connection: OK'
+            echo 'Working directory:'
+            pwd
+            SITE_DIR='/hosting257022.af9b8.netcup.net/httpdocs'
+            if [ -d "$SITE_DIR" ]; then
+              echo 'Site directory: FOUND'
+              if [ -f "$SITE_DIR/api/auth/index.php" ]; then
+                echo 'Backend auth: FOUND'
+              else
+                echo 'Backend auth: NOT FOUND'
+              fi
+              if [ -f "$SITE_DIR/kitchen/index.php" ]; then
+                echo 'Kitchen PHP entry: FOUND'
+              else
+                echo 'Kitchen PHP entry: NOT FOUND'
+              fi
+            else
+              echo 'Site directory: NOT FOUND'
+              exit 1
+            fi
