@@ -1,0 +1,85 @@
+name: Schawa Grill - Netcup V1.4K cashier ready fix
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: 'Actually install V1.4K? (unchecked = read-only)'
+        type: boolean
+        required: true
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: schawa-netcup-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Validate patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s deploy/v1.4k/httpdocs/api/orders/staff-action.php
+          grep -Fq "UPDATE order_items SET status='ready' WHERE order_id=? AND status='cooking'" deploy/v1.4k/httpdocs/api/orders/staff-action.php
+          if grep -E -n '(DB_PASSWORD|BEGIN (RSA |OPENSSH )?PRIVATE KEY)' deploy/v1.4k/httpdocs/api/orders/staff-action.php; then exit 1; fi
+      - name: Check remote path (read-only)
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          script_stop: true
+          script: |
+            set -eu
+            B=/hosting257022.af9b8.netcup.net
+            test -f "$B/httpdocs/api/orders/staff-action.php"
+            test ! -L "$B/httpdocs/api/orders/staff-action.php"
+            test -f "$B/private/auth.php"
+            echo 'Remote path OK. No files changed.'
+      - name: Upload patch to staging
+        if: ${{ inputs.deploy == true }}
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          source: 'deploy/v1.4k/httpdocs/api/orders/staff-action.php'
+          target: '/hosting257022.af9b8.netcup.net/private/github-deploy-stage'
+          overwrite: true
+      - name: Verify existing server version, backup and install
+        if: ${{ inputs.deploy == true }}
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          script_stop: true
+          script: |
+            set -eu
+            B=/hosting257022.af9b8.netcup.net
+            SRC="$B/private/github-deploy-stage/deploy/v1.4k/httpdocs/api/orders/staff-action.php"
+            DST="$B/httpdocs/api/orders/staff-action.php"
+            test -s "$SRC"
+            test -f "$DST"
+            test ! -L "$DST"
+            php -l "$SRC"
+            # Refuse deployment if server code has diverged from the known V1.4H/I/J baseline.
+            grep -Fq "status NOT IN ('ready','cancelled')" "$DST" || { echo 'Server staff-action.php differs from expected baseline; aborting.'; exit 1; }
+            grep -Fq "staff_v14f" "$DST" || { echo 'Server staff-action.php differs from expected baseline; aborting.'; exit 1; }
+            D="$B/private/github-deploy-backups/v1.4k-$(date +%Y%m%d-%H%M%S)"
+            mkdir -p "$D"
+            cp -p "$DST" "$D/staff-action.php"
+            echo "Backup created: $D"
+            cp "$SRC" "$DST"
+            php -l "$DST"
+            echo 'V1.4K installed: one PHP API file. No DB changes.'
