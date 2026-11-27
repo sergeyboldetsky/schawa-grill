@@ -1,0 +1,92 @@
+name: Schawa Grill - Netcup V1.6.1 Combo cook display
+on:
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: 'Actually install V1.6.1? Unchecked = read-only verification'
+        type: boolean
+        required: true
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: schawa-netcup-deploy
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate package
+        run: |
+          set -euo pipefail
+          node --check deploy/v1.6.1/httpdocs/assets/staff-native.js
+          php -l deploy/v1.6.1/private/interfaces/cook.php
+          php -l deploy/v1.6.1/private/interfaces/kitchen.php
+      - name: Check server paths (read only)
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          script_stop: true
+          script: |
+            set -eu
+            B=/hosting257022.af9b8.netcup.net
+            test -f "$B/httpdocs/assets/staff-native.js"; test ! -L "$B/httpdocs/assets/staff-native.js"; test "$(sha256sum "$B/httpdocs/assets/staff-native.js" | cut -d' ' -f1)" = 74e8b469910a532f85709f4da2e46c7260d5fcdf6e9e5915ae0097ff364ed3b8 || { echo "Unexpected version: httpdocs/assets/staff-native.js"; exit 1; }
+            test -f "$B/private/interfaces/cook.php"; test ! -L "$B/private/interfaces/cook.php"; test "$(sha256sum "$B/private/interfaces/cook.php" | cut -d' ' -f1)" = f33e95347733d80e5b08fab8cf56d109a496f2d1fc5e29ec6b42f940cbccee7b || { echo "Unexpected version: private/interfaces/cook.php"; exit 1; }
+            test -f "$B/private/interfaces/kitchen.php"; test ! -L "$B/private/interfaces/kitchen.php"; test "$(sha256sum "$B/private/interfaces/kitchen.php" | cut -d' ' -f1)" = 196019d778026c791e9e8dcb56b6ac43cd94b0241d0b6b315126cdf320251dde || { echo "Unexpected version: private/interfaces/kitchen.php"; exit 1; }
+      - name: Upload staging package
+        if: ${{ inputs.deploy == true }}
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          source: 'deploy/v1.6.1/httpdocs/assets/staff-native.js,deploy/v1.6.1/private/interfaces/cook.php,deploy/v1.6.1/private/interfaces/kitchen.php'
+          target: '/hosting257022.af9b8.netcup.net/private/github-deploy-stage'
+          overwrite: true
+      - name: Backup and install V1.6.1
+        if: ${{ inputs.deploy == true }}
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          script_stop: true
+          script: |
+            set -eu
+            B=/hosting257022.af9b8.netcup.net
+            test -f "$B/httpdocs/assets/staff-native.js"; test ! -L "$B/httpdocs/assets/staff-native.js"; test "$(sha256sum "$B/httpdocs/assets/staff-native.js" | cut -d' ' -f1)" = 74e8b469910a532f85709f4da2e46c7260d5fcdf6e9e5915ae0097ff364ed3b8 || { echo "Unexpected version: httpdocs/assets/staff-native.js"; exit 1; }
+            test -f "$B/private/interfaces/cook.php"; test ! -L "$B/private/interfaces/cook.php"; test "$(sha256sum "$B/private/interfaces/cook.php" | cut -d' ' -f1)" = f33e95347733d80e5b08fab8cf56d109a496f2d1fc5e29ec6b42f940cbccee7b || { echo "Unexpected version: private/interfaces/cook.php"; exit 1; }
+            test -f "$B/private/interfaces/kitchen.php"; test ! -L "$B/private/interfaces/kitchen.php"; test "$(sha256sum "$B/private/interfaces/kitchen.php" | cut -d' ' -f1)" = 196019d778026c791e9e8dcb56b6ac43cd94b0241d0b6b315126cdf320251dde || { echo "Unexpected version: private/interfaces/kitchen.php"; exit 1; }
+            S="$B/private/github-deploy-stage/deploy/v1.6.1"
+            BK="$B/private/github-deploy-backups/v1.6.1-$(date +%Y%m%d-%H%M%S)"
+            mkdir -p "$BK"
+            test -s "$S/httpdocs/assets/staff-native.js"
+            test "$(sha256sum "$S/httpdocs/assets/staff-native.js" | cut -d' ' -f1)" = 9f41322709c0bb86cd4aa01411b0aa5172d0e78bdb996c7051fb4a01a417b4fc
+            test -s "$S/private/interfaces/cook.php"
+            test "$(sha256sum "$S/private/interfaces/cook.php" | cut -d' ' -f1)" = e9561eeee552ec2861b07c201fe72ecdbb1d6bf21d335a88b4b2b015c2830ec7
+            test -s "$S/private/interfaces/kitchen.php"
+            test "$(sha256sum "$S/private/interfaces/kitchen.php" | cut -d' ' -f1)" = b261128d2069a47f48177df9ee63b1ccbb2d7203adece07ead1764dc759ae4aa
+            mkdir -p "$BK/httpdocs/assets"
+            mkdir -p "$BK/httpdocs/assets"
+            cp -p "$B/httpdocs/assets/staff-native.js" "$BK/httpdocs/assets/staff-native.js"
+            mkdir -p "$BK/private/interfaces"
+            cp -p "$B/private/interfaces/cook.php" "$BK/private/interfaces/cook.php"
+            mkdir -p "$BK/private/interfaces"
+            cp -p "$B/private/interfaces/kitchen.php" "$BK/private/interfaces/kitchen.php"
+            rollback() {
+              cp -p "$BK/httpdocs/assets/staff-native.js" "$B/httpdocs/assets/staff-native.js" || true
+              cp -p "$BK/private/interfaces/cook.php" "$B/private/interfaces/cook.php" || true
+              cp -p "$BK/private/interfaces/kitchen.php" "$B/private/interfaces/kitchen.php" || true
+            }
+            trap rollback EXIT
+            cp "$S/httpdocs/assets/staff-native.js" "$B/httpdocs/assets/staff-native.js"
+            cp "$S/private/interfaces/cook.php" "$B/private/interfaces/cook.php"
+            cp "$S/private/interfaces/kitchen.php" "$B/private/interfaces/kitchen.php"
+            trap - EXIT
+            echo "V1.6.1 installed. Backup: $BK"
