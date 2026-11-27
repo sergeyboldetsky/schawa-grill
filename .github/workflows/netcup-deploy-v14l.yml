@@ -1,0 +1,74 @@
+name: Schawa Grill - Netcup V1.4L cashier layout
+on:
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: 'Install cashier layout patch? (unchecked = read-only)'
+        type: boolean
+        required: true
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: schawa-netcup-deploy
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate file
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s deploy/v1.4l/httpdocs/assets/staff-native.js
+          grep -Fq 'grid-template-columns:repeat(3,minmax(0,1fr))' deploy/v1.4l/httpdocs/assets/staff-native.js
+          node --check deploy/v1.4l/httpdocs/assets/staff-native.js
+      - name: Check remote paths
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          script_stop: true
+          script: |
+            set -eu
+            B=/hosting257022.af9b8.netcup.net
+            test -f "$B/httpdocs/assets/staff-native.js"
+            test ! -L "$B/httpdocs/assets/staff-native.js"
+            grep -Fq 'grid-template-columns:repeat(5,minmax(0,1fr))' "$B/httpdocs/assets/staff-native.js" || { echo 'Remote JS differs; aborting'; exit 1; }
+            echo 'Path and baseline OK'
+      - name: Upload to staging
+        if: ${{ inputs.deploy == true }}
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          source: 'deploy/v1.4l/httpdocs/assets/staff-native.js'
+          target: '/hosting257022.af9b8.netcup.net/private/github-deploy-stage'
+          overwrite: true
+      - name: Backup and install
+        if: ${{ inputs.deploy == true }}
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          script_stop: true
+          script: |
+            set -eu
+            B=/hosting257022.af9b8.netcup.net
+            SRC="$B/private/github-deploy-stage/deploy/v1.4l/httpdocs/assets/staff-native.js"
+            DST="$B/httpdocs/assets/staff-native.js"
+            test -s "$SRC"
+            grep -Fq 'grid-template-columns:repeat(3,minmax(0,1fr))' "$SRC"
+            grep -Fq 'grid-template-columns:repeat(5,minmax(0,1fr))' "$DST" || { echo 'Baseline changed; aborting'; exit 1; }
+            D="$B/private/github-deploy-backups/v1.4l-$(date +%Y%m%d-%H%M%S)"
+            mkdir -p "$D"
+            cp -p "$DST" "$D/staff-native.js"
+            cp "$SRC" "$DST"
+            echo "V1.4L installed. Backup: $D"
