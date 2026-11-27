@@ -1,0 +1,79 @@
+name: Schawa Grill - Netcup V1.5B kitchen flow fix
+on:
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: 'Install kitchen flow fix? (unchecked = read-only)'
+        type: boolean
+        required: true
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: schawa-netcup-deploy
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate local patch
+        run: |
+          set -eu
+          node --check deploy/v1.5b/httpdocs/assets/staff-native.js
+          php -l deploy/v1.5b/httpdocs/api/orders/staff-action.php
+      - name: Check remote baseline (read-only)
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          script_stop: true
+          script: |
+            set -eu
+            B=/hosting257022.af9b8.netcup.net/httpdocs
+            test -f "$B/assets/staff-native.js"
+            test -f "$B/api/orders/staff-action.php"
+            test ! -L "$B/assets/staff-native.js"
+            test ! -L "$B/api/orders/staff-action.php"
+            grep -Fq "['waiting','cooking'].includes(o.status)" "$B/assets/staff-native.js" || { echo 'Unexpected JS baseline'; exit 1; }
+            grep -Fq "['cooking','ready','cancelled']" "$B/api/orders/staff-action.php" || { echo 'Unexpected PHP baseline'; exit 1; }
+      - name: Upload patch to staging
+        if: ${{ inputs.deploy == true }}
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          source: 'deploy/v1.5b/httpdocs/assets/staff-native.js,deploy/v1.5b/httpdocs/api/orders/staff-action.php'
+          target: '/hosting257022.af9b8.netcup.net/private/github-deploy-stage'
+          overwrite: true
+      - name: Backup and install both files
+        if: ${{ inputs.deploy == true }}
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          script_stop: true
+          script: |
+            set -eu
+            B=/hosting257022.af9b8.netcup.net
+            S="$B/private/github-deploy-stage/deploy/v1.5b/httpdocs"
+            D="$B/httpdocs"
+            test -s "$S/assets/staff-native.js"
+            test -s "$S/api/orders/staff-action.php"
+            php -l "$S/api/orders/staff-action.php"
+            grep -Fq "['waiting','cooking'].includes(o.status)" "$D/assets/staff-native.js" || exit 1
+            grep -Fq "['cooking','ready','cancelled']" "$D/api/orders/staff-action.php" || exit 1
+            BK="$B/private/github-deploy-backups/v1.5b-$(date +%Y%m%d-%H%M%S)"
+            mkdir -p "$BK"
+            cp -p "$D/assets/staff-native.js" "$BK/staff-native.js"
+            cp -p "$D/api/orders/staff-action.php" "$BK/staff-action.php"
+            cp "$S/assets/staff-native.js" "$D/assets/staff-native.js"
+            cp "$S/api/orders/staff-action.php" "$D/api/orders/staff-action.php"
+            php -l "$D/api/orders/staff-action.php"
+            echo "V1.5B installed. Backup: $BK"
