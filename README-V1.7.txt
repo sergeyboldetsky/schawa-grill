@@ -1,0 +1,1 @@
+V1.7 Universal menus. Run workflow dry run first. Test mode only. Existing combo SKUs remain supported. Fries are counted but do not have independent preparation status. No database migration. Live MySQL not tested.
