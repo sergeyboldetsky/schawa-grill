@@ -1,0 +1,1 @@
+Extract into repository root. Commit and push. Actions > Schawa Grill - Netcup V1.6 MySQL order sync. Run first with deploy unchecked, then checked. Server files must match 5665.zip SHA256 hashes. Backup created before installation. No database changes. Test orders only.
