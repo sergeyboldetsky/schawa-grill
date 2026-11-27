@@ -1,0 +1,1 @@
+Extract both paths into the root of the GitHub repository. Commit, push, Actions > Schawa Grill - Netcup V1.5C staff interface fix > Run workflow > tick deploy. Then hard-refresh /cook/?server_test=1 and /kitchen/?server_test=1. This does not change public customer order status.
