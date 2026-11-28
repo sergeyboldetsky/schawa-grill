@@ -1,0 +1,99 @@
+name: Schawa Grill - Netcup V1.9F Server order history
+on:
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: 'Actually install V1.9F? Unchecked = read-only verification'
+        type: boolean
+        required: true
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: schawa-netcup-deploy
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate package
+        run: node --check deploy/v1.9f/httpdocs/assets/app.js && find deploy/v1.9f -name "*.php" -exec php -l {} \;
+      - name: Check server paths (read only)
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          script_stop: true
+          script: |
+            set -eu
+            B=/hosting257022.af9b8.netcup.net
+            test ! -e "$B/httpdocs/api/orders/history.php"; test ! -L "$B/httpdocs/api/orders/history.php"
+            test ! -L "$B/httpdocs/index.html"; test -f "$B/httpdocs/index.html"
+            ACTUAL=$(sha256sum "$B/httpdocs/index.html" | cut -d' ' -f1)
+            echo "index.html: $ACTUAL (expected d1285cf41cb0ccfecdaadd365eb56738cd267f34a509977d4860aae41c150086)"
+            test "$ACTUAL" = d1285cf41cb0ccfecdaadd365eb56738cd267f34a509977d4860aae41c150086
+            test ! -L "$B/httpdocs/assets/app.js"; test -f "$B/httpdocs/assets/app.js"
+            ACTUAL=$(sha256sum "$B/httpdocs/assets/app.js" | cut -d' ' -f1)
+            echo "assets/app.js: $ACTUAL (expected fe69be028c8e9c31fdf3dfae646d7604960debb64c6062573f772afbef04e1c5)"
+            test "$ACTUAL" = fe69be028c8e9c31fdf3dfae646d7604960debb64c6062573f772afbef04e1c5
+      - name: Upload staging package
+        if: ${{ inputs.deploy == true }}
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          source: 'deploy/v1.9f/httpdocs/index.html,deploy/v1.9f/httpdocs/assets/app.js,deploy/v1.9f/httpdocs/api/orders/history.php'
+          target: '/hosting257022.af9b8.netcup.net/private/github-deploy-stage'
+          overwrite: true
+      - name: Backup and install V1.9F
+        if: ${{ inputs.deploy == true }}
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          script_stop: true
+          script: |
+            set -eu
+            B=/hosting257022.af9b8.netcup.net
+            test ! -e "$B/httpdocs/api/orders/history.php"; test ! -L "$B/httpdocs/api/orders/history.php"
+            test ! -L "$B/httpdocs/index.html"; test -f "$B/httpdocs/index.html"
+            ACTUAL=$(sha256sum "$B/httpdocs/index.html" | cut -d' ' -f1)
+            echo "index.html: $ACTUAL (expected d1285cf41cb0ccfecdaadd365eb56738cd267f34a509977d4860aae41c150086)"
+            test "$ACTUAL" = d1285cf41cb0ccfecdaadd365eb56738cd267f34a509977d4860aae41c150086
+            test ! -L "$B/httpdocs/assets/app.js"; test -f "$B/httpdocs/assets/app.js"
+            ACTUAL=$(sha256sum "$B/httpdocs/assets/app.js" | cut -d' ' -f1)
+            echo "assets/app.js: $ACTUAL (expected fe69be028c8e9c31fdf3dfae646d7604960debb64c6062573f772afbef04e1c5)"
+            test "$ACTUAL" = fe69be028c8e9c31fdf3dfae646d7604960debb64c6062573f772afbef04e1c5
+            S="$B/private/github-deploy-stage/deploy/v1.9f"
+            BK="$B/private/github-deploy-backups/v1.9f-$(date +%Y%m%d-%H%M%S)"
+            test "$(sha256sum "$S/httpdocs/index.html" | cut -d' ' -f1)" = 607a75a71450d85fb72320fa048e9f023eef9303a5bc1b851f493c10ed014994
+            mkdir -p "$BK/httpdocs"
+            cp -p "$B/httpdocs/index.html" "$BK/httpdocs/index.html"
+            mkdir -p "$BK/httpdocs"
+            mkdir -p "$BK/private"
+            mkdir -p "$BK/httpdocs/api"
+            mkdir -p "$BK/httpdocs/assets"
+            test "$(sha256sum "$S/httpdocs/assets/app.js" | cut -d' ' -f1)" = 206855f3d71dcd15015bd00bd665cc0d0e7e6bceab3a571cf87842a4b21ecf93
+            mkdir -p "$BK/httpdocs/assets"
+            cp -p "$B/httpdocs/assets/app.js" "$BK/httpdocs/assets/app.js"
+            mkdir -p "$BK/httpdocs/api/orders"
+            test ! -e "$B/httpdocs/api/orders/history.php"; test ! -L "$B/httpdocs/api/orders/history.php"
+            test "$(sha256sum "$S/httpdocs/api/orders/history.php" | cut -d' ' -f1)" = cdd0180e5e4cb5d656de1ee6c0225d0af0c57ad626fd7c98dfa3103e875d9ea7
+            rollback() {
+              rm -f "$B/httpdocs/api/orders/history.php"
+              cp -p "$BK/httpdocs/index.html" "$B/httpdocs/index.html"
+              cp -p "$BK/httpdocs/assets/app.js" "$B/httpdocs/assets/app.js"
+            }
+            trap rollback EXIT
+            cp "$S/httpdocs/index.html" "$B/httpdocs/index.html"
+            cp "$S/httpdocs/assets/app.js" "$B/httpdocs/assets/app.js"
+            cp "$S/httpdocs/api/orders/history.php" "$B/httpdocs/api/orders/history.php"
+            trap - EXIT
+            echo "Installed V1.9F. Backup: $BK"
