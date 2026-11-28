@@ -1,0 +1,81 @@
+name: Schawa Grill - Netcup V1.9E Connection and history
+on:
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: 'Actually install V1.9E? Unchecked = read-only verification'
+        type: boolean
+        required: true
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: schawa-netcup-deploy
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate package
+        run: node --check deploy/v1.9e/httpdocs/assets/app.js && find deploy/v1.9e -name "*.php" -exec php -l {} \;
+      - name: Check server paths (read only)
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          script_stop: true
+          script: |
+            set -eu
+            B=/hosting257022.af9b8.netcup.net
+            test ! -L "$B/httpdocs/index.html"; test "$(sha256sum "$B/httpdocs/index.html" | cut -d' ' -f1)" = d1285cf41cb0ccfecdaadd365eb56738cd267f34a509977d4860aae41c150086
+            test ! -L "$B/httpdocs/assets/app.js"; test "$(sha256sum "$B/httpdocs/assets/app.js" | cut -d' ' -f1)" = fe69be028c8e9c31fdf3dfae646d7604960debb64c6062573f772afbef04e1c5
+      - name: Upload staging package
+        if: ${{ inputs.deploy == true }}
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          source: 'deploy/v1.9e/httpdocs/index.html,deploy/v1.9e/httpdocs/assets/app.js'
+          target: '/hosting257022.af9b8.netcup.net/private/github-deploy-stage'
+          overwrite: true
+      - name: Backup and install V1.9E
+        if: ${{ inputs.deploy == true }}
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          script_stop: true
+          script: |
+            set -eu
+            B=/hosting257022.af9b8.netcup.net
+            test ! -L "$B/httpdocs/index.html"; test "$(sha256sum "$B/httpdocs/index.html" | cut -d' ' -f1)" = d1285cf41cb0ccfecdaadd365eb56738cd267f34a509977d4860aae41c150086
+            test ! -L "$B/httpdocs/assets/app.js"; test "$(sha256sum "$B/httpdocs/assets/app.js" | cut -d' ' -f1)" = fe69be028c8e9c31fdf3dfae646d7604960debb64c6062573f772afbef04e1c5
+            S="$B/private/github-deploy-stage/deploy/v1.9e"
+            BK="$B/private/github-deploy-backups/v1.9e-$(date +%Y%m%d-%H%M%S)"
+            test "$(sha256sum "$S/httpdocs/index.html" | cut -d' ' -f1)" = d1285cf41cb0ccfecdaadd365eb56738cd267f34a509977d4860aae41c150086
+            mkdir -p "$BK/httpdocs"
+            cp -p "$B/httpdocs/index.html" "$BK/httpdocs/index.html"
+            mkdir -p "$BK/httpdocs"
+            mkdir -p "$BK/private"
+            mkdir -p "$BK/httpdocs/api"
+            mkdir -p "$BK/httpdocs/assets"
+            test "$(sha256sum "$S/httpdocs/assets/app.js" | cut -d' ' -f1)" = fe69be028c8e9c31fdf3dfae646d7604960debb64c6062573f772afbef04e1c5
+            mkdir -p "$BK/httpdocs/assets"
+            cp -p "$B/httpdocs/assets/app.js" "$BK/httpdocs/assets/app.js"
+            mkdir -p "$BK/httpdocs/api/orders"
+            rollback() {
+              cp -p "$BK/httpdocs/index.html" "$B/httpdocs/index.html"
+              cp -p "$BK/httpdocs/assets/app.js" "$B/httpdocs/assets/app.js"
+            }
+            trap rollback EXIT
+            cp "$S/httpdocs/index.html" "$B/httpdocs/index.html"
+            cp "$S/httpdocs/assets/app.js" "$B/httpdocs/assets/app.js"
+            trap - EXIT
+            echo "Installed V1.9E. Backup: $BK"
