@@ -1,0 +1,1 @@
+V1.9A: manual order pause. Login as owner/admin, open /order-control.html. Default accepting=true preserves test behavior. Existing orders unaffected. No production activation. DRY RUN first. Settings stored in private JSON, not MySQL. No schedule or other V1.9 features yet.
