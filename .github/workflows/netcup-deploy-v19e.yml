@@ -30,8 +30,14 @@ jobs:
           script: |
             set -eu
             B=/hosting257022.af9b8.netcup.net
-            test ! -L "$B/httpdocs/index.html"; test "$(sha256sum "$B/httpdocs/index.html" | cut -d' ' -f1)" = d1285cf41cb0ccfecdaadd365eb56738cd267f34a509977d4860aae41c150086
-            test ! -L "$B/httpdocs/assets/app.js"; test "$(sha256sum "$B/httpdocs/assets/app.js" | cut -d' ' -f1)" = fe69be028c8e9c31fdf3dfae646d7604960debb64c6062573f772afbef04e1c5
+            test ! -L "$B/httpdocs/index.html"; test -f "$B/httpdocs/index.html"
+            ACTUAL=$(sha256sum "$B/httpdocs/index.html" | cut -d' ' -f1)
+            echo "index.html: $ACTUAL (expected c09a95908aed6b9640699aa2611a7ca8ad97e7ce9c7b751682dd9b5defef131d)"
+            test "$ACTUAL" = c09a95908aed6b9640699aa2611a7ca8ad97e7ce9c7b751682dd9b5defef131d
+            test ! -L "$B/httpdocs/assets/app.js"; test -f "$B/httpdocs/assets/app.js"
+            ACTUAL=$(sha256sum "$B/httpdocs/assets/app.js" | cut -d' ' -f1)
+            echo "assets/app.js: $ACTUAL (expected fe27525ef53d1814e8920c364e7f401ecc346ec34bcac46cd36d4548703291b9)"
+            test "$ACTUAL" = fe27525ef53d1814e8920c364e7f401ecc346ec34bcac46cd36d4548703291b9
       - name: Upload staging package
         if: ${{ inputs.deploy == true }}
         uses: appleboy/scp-action@v1
@@ -55,8 +61,14 @@ jobs:
           script: |
             set -eu
             B=/hosting257022.af9b8.netcup.net
-            test ! -L "$B/httpdocs/index.html"; test "$(sha256sum "$B/httpdocs/index.html" | cut -d' ' -f1)" = d1285cf41cb0ccfecdaadd365eb56738cd267f34a509977d4860aae41c150086
-            test ! -L "$B/httpdocs/assets/app.js"; test "$(sha256sum "$B/httpdocs/assets/app.js" | cut -d' ' -f1)" = fe69be028c8e9c31fdf3dfae646d7604960debb64c6062573f772afbef04e1c5
+            test ! -L "$B/httpdocs/index.html"; test -f "$B/httpdocs/index.html"
+            ACTUAL=$(sha256sum "$B/httpdocs/index.html" | cut -d' ' -f1)
+            echo "index.html: $ACTUAL (expected c09a95908aed6b9640699aa2611a7ca8ad97e7ce9c7b751682dd9b5defef131d)"
+            test "$ACTUAL" = c09a95908aed6b9640699aa2611a7ca8ad97e7ce9c7b751682dd9b5defef131d
+            test ! -L "$B/httpdocs/assets/app.js"; test -f "$B/httpdocs/assets/app.js"
+            ACTUAL=$(sha256sum "$B/httpdocs/assets/app.js" | cut -d' ' -f1)
+            echo "assets/app.js: $ACTUAL (expected fe27525ef53d1814e8920c364e7f401ecc346ec34bcac46cd36d4548703291b9)"
+            test "$ACTUAL" = fe27525ef53d1814e8920c364e7f401ecc346ec34bcac46cd36d4548703291b9
             S="$B/private/github-deploy-stage/deploy/v1.9e"
             BK="$B/private/github-deploy-backups/v1.9e-$(date +%Y%m%d-%H%M%S)"
             test "$(sha256sum "$S/httpdocs/index.html" | cut -d' ' -f1)" = d1285cf41cb0ccfecdaadd365eb56738cd267f34a509977d4860aae41c150086
