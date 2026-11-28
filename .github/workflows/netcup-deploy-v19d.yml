@@ -1,0 +1,87 @@
+name: Schawa Grill - Netcup V1.9D Order recovery
+on:
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: 'Actually install V1.9D? Unchecked = read-only verification'
+        type: boolean
+        required: true
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: schawa-netcup-deploy
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate package
+        run: node --check deploy/v1.9d/httpdocs/assets/app.js && find deploy/v1.9d -name "*.php" -exec php -l {} \;
+      - name: Check server paths (read only)
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          script_stop: true
+          script: |
+            set -eu
+            B=/hosting257022.af9b8.netcup.net
+            test ! -L "$B/httpdocs/index.html"; test "$(sha256sum "$B/httpdocs/index.html" | cut -d' ' -f1)" = 5b5508930c2619a2e7a3287469416ec8483161e66532b9352ef4d4b01d87b8d5
+            test ! -L "$B/httpdocs/assets/app.js"; test "$(sha256sum "$B/httpdocs/assets/app.js" | cut -d' ' -f1)" = 015a0cdc7378c5495a8fea4ecfd27d6f64c42a84361cbc9eb245c24445128092
+            test ! -L "$B/httpdocs/api/orders/create.php"; test "$(sha256sum "$B/httpdocs/api/orders/create.php" | cut -d' ' -f1)" = c16936daf8f14f5b8fce484445fef84d36562aaf42662817590e416772d788f3
+      - name: Upload staging package
+        if: ${{ inputs.deploy == true }}
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          source: 'deploy/v1.9d/httpdocs/index.html,deploy/v1.9d/httpdocs/assets/app.js,deploy/v1.9d/httpdocs/api/orders/create.php'
+          target: '/hosting257022.af9b8.netcup.net/private/github-deploy-stage'
+          overwrite: true
+      - name: Backup and install V1.9D
+        if: ${{ inputs.deploy == true }}
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          script_stop: true
+          script: |
+            set -eu
+            B=/hosting257022.af9b8.netcup.net
+            test ! -L "$B/httpdocs/index.html"; test "$(sha256sum "$B/httpdocs/index.html" | cut -d' ' -f1)" = 5b5508930c2619a2e7a3287469416ec8483161e66532b9352ef4d4b01d87b8d5
+            test ! -L "$B/httpdocs/assets/app.js"; test "$(sha256sum "$B/httpdocs/assets/app.js" | cut -d' ' -f1)" = 015a0cdc7378c5495a8fea4ecfd27d6f64c42a84361cbc9eb245c24445128092
+            test ! -L "$B/httpdocs/api/orders/create.php"; test "$(sha256sum "$B/httpdocs/api/orders/create.php" | cut -d' ' -f1)" = c16936daf8f14f5b8fce484445fef84d36562aaf42662817590e416772d788f3
+            S="$B/private/github-deploy-stage/deploy/v1.9d"
+            BK="$B/private/github-deploy-backups/v1.9d-$(date +%Y%m%d-%H%M%S)"
+            test "$(sha256sum "$S/httpdocs/index.html" | cut -d' ' -f1)" = c09a95908aed6b9640699aa2611a7ca8ad97e7ce9c7b751682dd9b5defef131d
+            mkdir -p "$BK/httpdocs"
+            cp -p "$B/httpdocs/index.html" "$BK/httpdocs/index.html"
+            mkdir -p "$BK/httpdocs"
+            mkdir -p "$BK/private"
+            mkdir -p "$BK/httpdocs/api"
+            mkdir -p "$BK/httpdocs/assets"
+            test "$(sha256sum "$S/httpdocs/assets/app.js" | cut -d' ' -f1)" = fe27525ef53d1814e8920c364e7f401ecc346ec34bcac46cd36d4548703291b9
+            mkdir -p "$BK/httpdocs/assets"
+            cp -p "$B/httpdocs/assets/app.js" "$BK/httpdocs/assets/app.js"
+            test "$(sha256sum "$S/httpdocs/api/orders/create.php" | cut -d' ' -f1)" = 939084f9e8fe15b3abee8ce05f6dffe9783739848105b83342e00b4eec6b422a
+            mkdir -p "$BK/httpdocs/api/orders"
+            cp -p "$B/httpdocs/api/orders/create.php" "$BK/httpdocs/api/orders/create.php"
+            rollback() {
+              cp -p "$BK/httpdocs/index.html" "$B/httpdocs/index.html"
+              cp -p "$BK/httpdocs/assets/app.js" "$B/httpdocs/assets/app.js"
+              cp -p "$BK/httpdocs/api/orders/create.php" "$B/httpdocs/api/orders/create.php"
+            }
+            trap rollback EXIT
+            cp "$S/httpdocs/index.html" "$B/httpdocs/index.html"
+            cp "$S/httpdocs/assets/app.js" "$B/httpdocs/assets/app.js"
+            cp "$S/httpdocs/api/orders/create.php" "$B/httpdocs/api/orders/create.php"
+            trap - EXIT
+            echo "Installed V1.9D. Backup: $BK"
