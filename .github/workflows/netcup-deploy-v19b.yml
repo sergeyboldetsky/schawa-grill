@@ -1,0 +1,111 @@
+name: Schawa Grill - Netcup V1.9B Opening hours
+on:
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: 'Actually install V1.9B? Unchecked = read-only verification'
+        type: boolean
+        required: true
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: schawa-netcup-deploy
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate package
+        run: node --check deploy/v1.9b/httpdocs/assets/app.js && node --check deploy/v1.9b/httpdocs/assets/order-control.js && find deploy/v1.9b -name "*.php" -exec php -l {} \;
+      - name: Check server paths (read only)
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          script_stop: true
+          script: |
+            set -eu
+            B=/hosting257022.af9b8.netcup.net
+            test ! -L "$B/httpdocs/index.html"; test "$(sha256sum "$B/httpdocs/index.html" | cut -d' ' -f1)" = 4019720a7557377655cbbc515986ec71c6e785492a0178aef4b22d28e9edf681
+            test ! -L "$B/httpdocs/order-control.html"; test "$(sha256sum "$B/httpdocs/order-control.html" | cut -d' ' -f1)" = 80ac1dce1141b98f6da914624ff475e316ac2b475934a6986724076471257c51
+            test ! -L "$B/private/order-control.php"; test "$(sha256sum "$B/private/order-control.php" | cut -d' ' -f1)" = 46ec13fe50389393e531f3942b335bcf5a958c8d34353f2039602fbd88a3edf4
+            test ! -L "$B/httpdocs/api/order-control.php"; test "$(sha256sum "$B/httpdocs/api/order-control.php" | cut -d' ' -f1)" = b537d32fdc3f4524bdedb5f3d2ddec54e87e95c85d10bf6ce9f45ae8253a5484
+            test ! -L "$B/httpdocs/assets/order-control.js"; test "$(sha256sum "$B/httpdocs/assets/order-control.js" | cut -d' ' -f1)" = 26d7563c2a353814450e4c0d5982f5e8fcb07a32551b83bfb17a0b148db8c9fe
+            test ! -L "$B/httpdocs/assets/app.js"; test "$(sha256sum "$B/httpdocs/assets/app.js" | cut -d' ' -f1)" = 1c7e23d0fa076b8264ae28ff087fad6f7c227ae89632ec93cbf9dab3702f8fc1
+            test ! -L "$B/httpdocs/api/orders/create.php"; test "$(sha256sum "$B/httpdocs/api/orders/create.php" | cut -d' ' -f1)" = a07221bf66b21dad0e04d379f4dde2d0f63e4aa6864a21c06dae8fcc5c1143c1
+      - name: Upload staging package
+        if: ${{ inputs.deploy == true }}
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          source: 'deploy/v1.9b/httpdocs/index.html,deploy/v1.9b/httpdocs/order-control.html,deploy/v1.9b/private/order-control.php,deploy/v1.9b/httpdocs/api/order-control.php,deploy/v1.9b/httpdocs/assets/order-control.js,deploy/v1.9b/httpdocs/assets/app.js,deploy/v1.9b/httpdocs/api/orders/create.php'
+          target: '/hosting257022.af9b8.netcup.net/private/github-deploy-stage'
+          overwrite: true
+      - name: Backup and install V1.9B
+        if: ${{ inputs.deploy == true }}
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          script_stop: true
+          script: |
+            set -eu
+            B=/hosting257022.af9b8.netcup.net
+            test ! -L "$B/httpdocs/index.html"; test "$(sha256sum "$B/httpdocs/index.html" | cut -d' ' -f1)" = 4019720a7557377655cbbc515986ec71c6e785492a0178aef4b22d28e9edf681
+            test ! -L "$B/httpdocs/order-control.html"; test "$(sha256sum "$B/httpdocs/order-control.html" | cut -d' ' -f1)" = 80ac1dce1141b98f6da914624ff475e316ac2b475934a6986724076471257c51
+            test ! -L "$B/private/order-control.php"; test "$(sha256sum "$B/private/order-control.php" | cut -d' ' -f1)" = 46ec13fe50389393e531f3942b335bcf5a958c8d34353f2039602fbd88a3edf4
+            test ! -L "$B/httpdocs/api/order-control.php"; test "$(sha256sum "$B/httpdocs/api/order-control.php" | cut -d' ' -f1)" = b537d32fdc3f4524bdedb5f3d2ddec54e87e95c85d10bf6ce9f45ae8253a5484
+            test ! -L "$B/httpdocs/assets/order-control.js"; test "$(sha256sum "$B/httpdocs/assets/order-control.js" | cut -d' ' -f1)" = 26d7563c2a353814450e4c0d5982f5e8fcb07a32551b83bfb17a0b148db8c9fe
+            test ! -L "$B/httpdocs/assets/app.js"; test "$(sha256sum "$B/httpdocs/assets/app.js" | cut -d' ' -f1)" = 1c7e23d0fa076b8264ae28ff087fad6f7c227ae89632ec93cbf9dab3702f8fc1
+            test ! -L "$B/httpdocs/api/orders/create.php"; test "$(sha256sum "$B/httpdocs/api/orders/create.php" | cut -d' ' -f1)" = a07221bf66b21dad0e04d379f4dde2d0f63e4aa6864a21c06dae8fcc5c1143c1
+            S="$B/private/github-deploy-stage/deploy/v1.9b"
+            BK="$B/private/github-deploy-backups/v1.9b-$(date +%Y%m%d-%H%M%S)"
+            test "$(sha256sum "$S/httpdocs/index.html" | cut -d' ' -f1)" = e539823c088514e077cd7522a0d0bf59327811567087c3dd470f355affc2bf05
+            mkdir -p "$BK/httpdocs"
+            cp -p "$B/httpdocs/index.html" "$BK/httpdocs/index.html"
+            test "$(sha256sum "$S/httpdocs/order-control.html" | cut -d' ' -f1)" = 4f0f6f7e4b8308d0e2524fb77982774b1e0225d9aaab551f389fbdee7b10ea61
+            mkdir -p "$BK/httpdocs"
+            cp -p "$B/httpdocs/order-control.html" "$BK/httpdocs/order-control.html"
+            test "$(sha256sum "$S/private/order-control.php" | cut -d' ' -f1)" = 0944c5a6a442a599e0ba58192af5726dc0bcfddbf63b5eff88260eb6304e1296
+            mkdir -p "$BK/private"
+            cp -p "$B/private/order-control.php" "$BK/private/order-control.php"
+            test "$(sha256sum "$S/httpdocs/api/order-control.php" | cut -d' ' -f1)" = 8fafc7ad651330f5857483e75c75826ceae5940a66a9a30d2711bd3a581f17b6
+            mkdir -p "$BK/httpdocs/api"
+            cp -p "$B/httpdocs/api/order-control.php" "$BK/httpdocs/api/order-control.php"
+            test "$(sha256sum "$S/httpdocs/assets/order-control.js" | cut -d' ' -f1)" = 26d7563c2a353814450e4c0d5982f5e8fcb07a32551b83bfb17a0b148db8c9fe
+            mkdir -p "$BK/httpdocs/assets"
+            cp -p "$B/httpdocs/assets/order-control.js" "$BK/httpdocs/assets/order-control.js"
+            test "$(sha256sum "$S/httpdocs/assets/app.js" | cut -d' ' -f1)" = 81a16e76a0dcf14e3e9bc6d71ee45827c6ea9b091c057bf4330093f2c661471f
+            mkdir -p "$BK/httpdocs/assets"
+            cp -p "$B/httpdocs/assets/app.js" "$BK/httpdocs/assets/app.js"
+            test "$(sha256sum "$S/httpdocs/api/orders/create.php" | cut -d' ' -f1)" = cec2e30e91aa7b664d31fde2e44153bd1398cf6fdb4bcafd133c34612a1a649f
+            mkdir -p "$BK/httpdocs/api/orders"
+            cp -p "$B/httpdocs/api/orders/create.php" "$BK/httpdocs/api/orders/create.php"
+            rollback() {
+              cp -p "$BK/httpdocs/index.html" "$B/httpdocs/index.html"
+              cp -p "$BK/httpdocs/order-control.html" "$B/httpdocs/order-control.html"
+              cp -p "$BK/private/order-control.php" "$B/private/order-control.php"
+              cp -p "$BK/httpdocs/api/order-control.php" "$B/httpdocs/api/order-control.php"
+              cp -p "$BK/httpdocs/assets/order-control.js" "$B/httpdocs/assets/order-control.js"
+              cp -p "$BK/httpdocs/assets/app.js" "$B/httpdocs/assets/app.js"
+              cp -p "$BK/httpdocs/api/orders/create.php" "$B/httpdocs/api/orders/create.php"
+            }
+            trap rollback EXIT
+            cp "$S/httpdocs/index.html" "$B/httpdocs/index.html"
+            cp "$S/httpdocs/order-control.html" "$B/httpdocs/order-control.html"
+            cp "$S/private/order-control.php" "$B/private/order-control.php"
+            cp "$S/httpdocs/api/order-control.php" "$B/httpdocs/api/order-control.php"
+            cp "$S/httpdocs/assets/order-control.js" "$B/httpdocs/assets/order-control.js"
+            cp "$S/httpdocs/assets/app.js" "$B/httpdocs/assets/app.js"
+            cp "$S/httpdocs/api/orders/create.php" "$B/httpdocs/api/orders/create.php"
+            trap - EXIT
+            echo "Installed V1.9B. Backup: $BK"
